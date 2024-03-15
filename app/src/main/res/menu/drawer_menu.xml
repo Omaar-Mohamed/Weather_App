@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group >
+        <item
+            android:id="@+id/homeFragment"
+            android:title="@string/home" />
+        <item
+            android:id="@+id/favouritFragment"
+            android:title="@string/favourit" />
+        <item
+            android:id="@+id/alertFragment"
+            android:title="@string/alert" />
+        <item
+            android:id="@+id/settingsFragment"
+            android:title="@string/settings" />
+
+    </group>
+</menu>
