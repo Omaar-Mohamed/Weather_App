@@ -1,5 +1,7 @@
 package com.example.weatherapp.favourit.view
 
+import android.location.Address
+import android.location.Geocoder
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -12,6 +14,8 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import java.io.IOException
+import java.util.Locale
 
 class MapActivity : FragmentActivity() , OnMapReadyCallback {
 
@@ -39,8 +43,23 @@ class MapActivity : FragmentActivity() , OnMapReadyCallback {
             // Handle map click
             gMap.clear() // Clear existing markers
             gMap.addMarker(MarkerOptions().position(latLng).title("Selected Location"))
-            Log.i("mapInfo", "onMapReady: $latLng")
-//            coordinates = latLng
+
+            // Use Geocoder to retrieve address information
+            val geocoder = Geocoder(this, Locale.getDefault())
+            try {
+                val addresses: List<Address>? = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+                if (!addresses.isNullOrEmpty()) {
+                    val address: Address = addresses[0]
+                    val addressString = address.getAddressLine(0) // Get the first line of the address
+                    Log.i("mapInfo", "Address: $addressString")
+                    // Now you can use the addressString as needed, such as displaying it in a TextView
+                } else {
+                    Log.i("mapInfo", "No address found for the provided coordinates")
+                }
+            } catch (e: IOException) {
+                Log.e("mapInfo", "Error getting address: ${e.message}")
+            }
         }
     }
+
 }
