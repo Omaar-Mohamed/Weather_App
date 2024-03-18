@@ -51,7 +51,7 @@ class HomeFragment : Fragment() {
         binding.recyclerViewHourlyWeather.adapter = hourlyAdapter
         homeViewModelFactory = HomeViewModelFactory(
             AppRepoImpl.getInstance(
-                AppRemoteDataSourseImpl, AppLocalDataSourseImpL
+                AppRemoteDataSourseImpl, AppLocalDataSourseImpL.getInstance(requireContext())
 
         ))
         // Initialize ViewModel
