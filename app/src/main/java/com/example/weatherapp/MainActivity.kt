@@ -152,7 +152,6 @@ class MainActivity : AppCompatActivity() {
                         val addressString =
                             "Country: ${addresses[0].countryName}\nadmin:${addresses[0].adminArea}\nStreet: ${addresses[0].getAddressLine(0)}"
 //                        address.text = addressString
-                        Toast.makeText(this@MainActivity, addressString, Toast.LENGTH_SHORT).show()
                         ApiConstants.address = addressString
 
                     }

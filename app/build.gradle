@@ -67,6 +67,11 @@ dependencies {
     kapt "androidx.room:room-compiler:2.6.1"
 
 
+ // jackson
+    implementation "com.fasterxml.jackson.core:jackson-annotations:2.13.1"
+
+    //Google play services
+    implementation 'com.google.android.gms:play-services-maps:18.2.0'
 
 
 

@@ -1,70 +1,142 @@
 package com.example.weatherapp.model.dto
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
+
 data class WeatherResponse(
-    val cod: String,
-    val message: Int,
-    val cnt: Int,
-    val list: List<WeatherListItem>,
-    val city: City
+    val lat: Double,
+    val lon: Double,
+    val timezone: String,
+    @JsonProperty("timezone_offset")
+    val timezoneOffset: Long,
+    val current: Current,
+    val minutely: List<Minutely>,
+    val hourly: List<Hourly>,
+    val daily: List<Daily>,
+    val alerts: List<Alert>,
 )
 
-data class WeatherListItem(
+data class Current(
     val dt: Long,
-    val main: MainData,
+    val sunrise: Long,
+    val sunset: Long,
+    val temp: Double,
+    @JsonProperty("feels_like")
+    val feelsLike: Double,
+    val pressure: Long,
+    val humidity: Long,
+    @JsonProperty("dew_point")
+    val dewPoint: Double,
+    val uvi: Double, // Change the type to Double
+    val clouds: Long,
+    val visibility: Long,
+    @JsonProperty("wind_speed")
+    val windSpeed: Double,
+    @JsonProperty("wind_deg")
+    val windDeg: Long,
     val weather: List<Weather>,
-    val clouds: Clouds,
-    val wind: Wind,
-    val visibility: Int,
-    val pop: Float,
-    val sys: Sys,
-    val dt_txt: String
 )
 
-data class MainData(
-    val temp: Double,
-    val feels_like: Double,
-    val temp_min: Double,
-    val temp_max: Double,
-    val pressure: Int,
-    val sea_level: Int,
-    val grnd_level: Int,
-    val humidity: Int,
-    val temp_kf: Double
-)
 
 data class Weather(
-    val id: Int,
+    val id: Long,
     val main: String,
     val description: String,
-    val icon: String
+    val icon: String,
 )
 
-data class Clouds(
-    val all: Int
+data class Minutely(
+    val dt: Long,
+    val precipitation: Long,
 )
 
-data class Wind(
-    val speed: Double,
-    val deg: Int,
-    val gust: Double
+data class Hourly(
+    val dt: Long,
+    val temp: Double,
+    @JsonProperty("feels_like")
+    val feelsLike: Double,
+    val pressure: Long,
+    val humidity: Long,
+    @JsonProperty("dew_point")
+    val dewPoint: Double,
+    val uvi: Double,
+    val clouds: Long,
+    val visibility: Long,
+    @JsonProperty("wind_speed")
+    val windSpeed: Double,
+    @JsonProperty("wind_deg")
+    val windDeg: Long,
+    @JsonProperty("wind_gust")
+    val windGust: Double,
+    val weather: List<Weather2>,
+    val pop: Double, // Change the type to Double
 )
 
-data class Sys(
-    val pod: String
+data class Weather2(
+    val id: Long,
+    val main: String,
+    val description: String,
+    val icon: String,
 )
 
-data class City(
-    val id: Int,
-    val name: String,
-    val coord: Coord,
-    val country: String,
-    val population: Int,
-    val timezone: Int,
+data class Daily(
+    val dt: Long,
     val sunrise: Long,
-    val sunset: Long
+    val sunset: Long,
+    val moonrise: Long,
+    val moonset: Long,
+    @JsonProperty("moon_phase")
+    val moonPhase: Double,
+    val summary: String,
+    val temp: Temp,
+    @JsonProperty("feels_like")
+    val feelsLike: FeelsLike,
+    val pressure: Long,
+    val humidity: Long,
+    @JsonProperty("dew_point")
+    val dewPoint: Double,
+    @JsonProperty("wind_speed")
+    val windSpeed: Double,
+    @JsonProperty("wind_deg")
+    val windDeg: Long,
+    @JsonProperty("wind_gust")
+    val windGust: Double,
+    val weather: List<Weather3>,
+    val clouds: Long,
+    val pop: Double,
+    val uvi: Double,
+    val rain: Double?,
 )
 
-data class Coord(
-    val lat: Double,
-    val lon: Double
+data class Temp(
+    val day: Double,
+    val min: Double,
+    val max: Double,
+    val night: Double,
+    val eve: Double,
+    val morn: Double,
+)
+
+data class FeelsLike(
+    val day: Double,
+    val night: Double,
+    val eve: Double,
+    val morn: Double,
+)
+
+data class Weather3(
+    val id: Long,
+    val main: String,
+    val description: String,
+    val icon: String,
+)
+
+data class Alert(
+    @JsonProperty("sender_name")
+    val senderName: String,
+    val event: String,
+    val start: Long,
+    val end: Long,
+    val description: String,
+    val tags: List<String>,
 )

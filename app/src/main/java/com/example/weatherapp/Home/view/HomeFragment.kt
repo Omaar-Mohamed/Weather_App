@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherapp.Home.viewmodel.HomeViewModel
 import com.example.weatherapp.Home.viewmodel.HomeViewModelFactory
 import com.example.weatherapp.R
@@ -29,6 +30,8 @@ class HomeFragment : Fragment() {
     lateinit var homeviewModel: HomeViewModel
     lateinit var binding: FragmentHomeBinding
     lateinit var homeViewModelFactory: HomeViewModelFactory
+    lateinit var myLayoutManager : LinearLayoutManager
+    lateinit var hourlyAdapter: HourlyAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,7 +44,11 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        hourlyAdapter = HourlyAdapter()
+        myLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        binding.recyclerViewHourlyWeather.layoutManager = myLayoutManager
 
+        binding.recyclerViewHourlyWeather.adapter = hourlyAdapter
         homeViewModelFactory = HomeViewModelFactory(
             AppRepoImpl.getInstance(
                 AppRemoteDataSourseImpl, AppLocalDataSourseImpL
@@ -60,7 +67,7 @@ class HomeFragment : Fragment() {
                 ApiConstants.lon!!,
                 ApiConstants.API_KEY
             )
-            Toast.makeText(requireContext(), ApiConstants.address, Toast.LENGTH_SHORT).show()
+//            Toast.makeText(requireContext(), ApiConstants.address, Toast.LENGTH_SHORT).show()
         }
         // Observe the weather data
         lifecycleScope.launch {
@@ -78,7 +85,10 @@ class HomeFragment : Fragment() {
                     is ApiState.Success -> {
                         // Handle success state
                         // binding.progressBar.visibility = View.GONE
-                        Log.i("response weather", "onCreateView:  ${it.data}" )
+                        Log.i("response weather", "onCreateView:  ${it.data.lat}" )
+                        Log.i("response weather", "onCreateView:  ${it.data.hourly}" )
+                        hourlyAdapter.submitList(it.data.hourly)
+
                     }
                 }
             }
