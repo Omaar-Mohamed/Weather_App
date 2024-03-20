@@ -47,7 +47,7 @@ class HourlyAdapter : ListAdapter<Hourly, HourlyAdapter.HourlyViewHolder>(Hourly
                 .load(ApiConstants.getWeatherIconUrl(hourly.weather[0].icon))
                 .into(imgWeather)
             txtWeather.text = hourly.weather[0].main
-                txtDegree.text = hourly.temp.toString()
+                txtDegree.text = ApiConstants.kelvinToCelsiusToAdapter(hourly.temp)
         }
     }
 }

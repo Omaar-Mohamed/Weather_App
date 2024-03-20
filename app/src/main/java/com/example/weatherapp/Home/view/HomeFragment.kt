@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.example.weatherapp.Home.viewmodel.HomeViewModel
 import com.example.weatherapp.Home.viewmodel.HomeViewModelFactory
 import com.example.weatherapp.R
@@ -32,6 +33,8 @@ class HomeFragment : Fragment() {
     lateinit var homeViewModelFactory: HomeViewModelFactory
     lateinit var myLayoutManager : LinearLayoutManager
     lateinit var hourlyAdapter: HourlyAdapter
+    lateinit var dailyLayoutManager: LinearLayoutManager
+    lateinit var dailyAdapter: DailyAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,10 +48,14 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         hourlyAdapter = HourlyAdapter()
+        dailyAdapter = DailyAdapter()
         myLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        dailyLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         binding.recyclerViewHourlyWeather.layoutManager = myLayoutManager
+        binding.recyclerViewDailyWeather.layoutManager = dailyLayoutManager
 
         binding.recyclerViewHourlyWeather.adapter = hourlyAdapter
+        binding.recyclerViewDailyWeather.adapter = dailyAdapter
         homeViewModelFactory = HomeViewModelFactory(
             AppRepoImpl.getInstance(
                 AppRemoteDataSourseImpl, AppLocalDataSourseImpL.getInstance(requireContext())
@@ -87,11 +94,37 @@ class HomeFragment : Fragment() {
                         // binding.progressBar.visibility = View.GONE
                         Log.i("response weather", "onCreateView:  ${it.data.lat}" )
                         Log.i("response weather", "onCreateView:  ${it.data.hourly}" )
+                        Glide.with(requireContext()).load("https://openweathermap.org/img/wn/${it.data.current.weather[0].icon}.png").into(
+                        binding.imageViewWeatherIcon)
+                       binding.textViewWeatherDescription.text = splitTimeZone(it.data.timezone)
+                        binding.textViewTemperature.text = kelvinToCelsius(it.data.current.temp)
                         hourlyAdapter.submitList(it.data.hourly)
+                        dailyAdapter.submitList(it.data.daily)
 
                     }
                 }
             }
         }
+    }
+    fun splitTimeZone(timezone: String) : String{
+
+        val parts = timezone.split("/")
+        if (parts.size == 2) {
+            val country = parts[0].trim()
+            val city = parts[1].trim()
+            // Now you can use `country` and `city` as needed
+            return "$country, $city"
+        } else {
+            return ""
+        }
+    }
+
+    fun kelvinToCelsius(kelvin: Double): String {
+        val celsius = kelvin - 273.15
+        return String.format("%.1f°C", celsius)
+    }
+    fun fehToCelsius(feh: Double): String {
+        var celsius = (feh - 32) * 5 / 9
+        return celsius . toString() + "°C"
     }
 }
