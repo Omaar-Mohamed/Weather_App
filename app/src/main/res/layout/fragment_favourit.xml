@@ -17,4 +17,9 @@
         android:src="@android:drawable/ic_input_add"
         android:importantForAccessibility="no" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewFav"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </RelativeLayout>

@@ -29,5 +29,13 @@ class FavouritViewModel(private val repostory:AppRepo) : ViewModel(){
         viewModelScope.launch {
             repostory.insertLocation(location)
         }
+
+
+    }
+
+    fun deleteLocation(location: FavLocations){
+        viewModelScope.launch {
+            repostory.deleteLocation(location)
+        }
     }
 }
