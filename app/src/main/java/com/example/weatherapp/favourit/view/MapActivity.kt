@@ -1,8 +1,9 @@
 package com.example.weatherapp.favourit.view
 
+import android.content.Intent
+import android.content.SharedPreferences
 import android.location.Address
 import android.location.Geocoder
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.FrameLayout
@@ -17,6 +18,7 @@ import com.example.weatherapp.model.AppRepoImpl
 import com.example.weatherapp.model.db.AppLocalDataSourseImpL
 import com.example.weatherapp.model.dto.FavLocations
 import com.example.weatherapp.model.network.AppRemoteDataSourseImpl
+import com.example.weatherapp.shared.ApiConstants
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -32,11 +34,15 @@ class MapActivity : FragmentActivity() , OnMapReadyCallback {
     lateinit var map: FrameLayout
     lateinit var favouritViewModel: FavouritViewModel
     lateinit var viewModelFactory: FavouritViewModelFactory
+    lateinit var Myintent: Intent
+    lateinit var extraValue: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main2)
         map = findViewById(R.id.map)
+        Myintent = intent
+         extraValue = Myintent.getStringExtra("request_fragment")?:""
         val supportMapFragment =
             supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         supportMapFragment.getMapAsync(this)
@@ -90,8 +96,18 @@ class MapActivity : FragmentActivity() , OnMapReadyCallback {
         builder.setMessage("Do you want to add this place as a favorite?")
         builder.setPositiveButton("Yes") { _, _ ->
             // Insert the location into the Room database
-            favouritViewModel.insertLocation(location)
-            Toast.makeText(this, "Location added to favorites", Toast.LENGTH_SHORT).show()
+            if (extraValue == "Alert"){
+                Toast.makeText(this, "Location added to Alarm", Toast.LENGTH_SHORT).show()
+//                ApiConstants.alertLocation = location.address
+                val SharedPreferences = getSharedPreferences("MySharedPref", MODE_PRIVATE)
+                val myEdit = SharedPreferences.edit()
+                myEdit.putString("alertLocation", location.address)
+                myEdit.apply()
+            }
+            else {
+                favouritViewModel.insertLocation(location)
+                Toast.makeText(this, "Location added to favorites", Toast.LENGTH_SHORT).show()
+            }
         }
         builder.setNegativeButton("No") { dialog, _ ->
             dialog.dismiss()

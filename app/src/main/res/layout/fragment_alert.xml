@@ -1,16 +1,25 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".alert.view.AlertFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".favourit.view.FavouritFragment">
 
-    <Button
-        android:id="@+id/button"
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAlert"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Show Alert Dialog"
-        android:layout_gravity="center"
-        android:onClick="showAlertDialog" />
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="16dp"
+        android:src="@android:drawable/ic_lock_idle_alarm"
+        android:importantForAccessibility="no" />
 
-</FrameLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewAlert"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</RelativeLayout>
