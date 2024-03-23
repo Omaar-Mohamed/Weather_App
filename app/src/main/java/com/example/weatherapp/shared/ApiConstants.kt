@@ -16,6 +16,8 @@ class ApiConstants {
         var address = "San Francisco"
         const val Google_API_KEY = "AIzaSyD3yjEwNflFdBz0N4Q-r4zkgQ6qiLcQBUs"
         var alertLocation = ""
+        var alartlon = ""
+        var alertlat = ""
 
         fun convertUnixTimestampToDateTime(unixTimestamp: Long): String {
             val date = Date(unixTimestamp * 1000L) // Convert seconds to milliseconds

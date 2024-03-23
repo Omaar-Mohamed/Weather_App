@@ -27,7 +27,8 @@ import kotlinx.coroutines.withContext
 class AlertWorker(appContext: Context, params: WorkerParameters) : CoroutineWorker(appContext, params) {
     override suspend fun doWork(): Result {
         try {
-            val weatherFlow = getCurrentWeather(applicationContext, ApiConstants.lat, ApiConstants.lon, ApiConstants.API_KEY)
+
+            val weatherFlow = getCurrentWeather(applicationContext,ApiConstants.alertlat,ApiConstants.alartlon ,  ApiConstants.API_KEY)
 
             weatherFlow
                 .catch {
@@ -40,6 +41,7 @@ class AlertWorker(appContext: Context, params: WorkerParameters) : CoroutineWork
 
                 val x = inputData.getString("title")
                 val y = inputData.getString("message")
+
 
                 showNotification(x, ApiConstants.splitTimeZone(weatherData.timezone))
 

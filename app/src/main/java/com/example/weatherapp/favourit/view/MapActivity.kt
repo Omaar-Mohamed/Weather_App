@@ -102,7 +102,10 @@ class MapActivity : FragmentActivity() , OnMapReadyCallback {
                 val SharedPreferences = getSharedPreferences("MySharedPref", MODE_PRIVATE)
                 val myEdit = SharedPreferences.edit()
                 myEdit.putString("alertLocation", location.address)
+
                 myEdit.apply()
+                ApiConstants.alertlat = location.latitude.toString()
+                ApiConstants.alartlon = location.longitude.toString()
             }
             else {
                 favouritViewModel.insertLocation(location)

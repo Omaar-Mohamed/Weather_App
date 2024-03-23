@@ -27,8 +27,8 @@
         <!-- ImageButton for the calendar -->
         <ImageButton
             android:id="@+id/locationimageButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:src="@drawable/location"
             android:background="?android:attr/selectableItemBackground"/>
 
@@ -53,8 +53,8 @@
         <!-- ImageButton for the calendar -->
         <ImageButton
             android:id="@+id/CalenderimageButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:src="@android:drawable/ic_menu_my_calendar"
             android:background="?android:attr/selectableItemBackground"/>
 
@@ -78,10 +78,10 @@
         <!-- ImageButton for the calendar -->
         <ImageButton
             android:id="@+id/CalenderTimeimageButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@android:drawable/ic_lock_idle_alarm"
-            android:background="?android:attr/selectableItemBackground"/>
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:src="@android:drawable/ic_lock_idle_alarm" />
 
     </LinearLayout>
 

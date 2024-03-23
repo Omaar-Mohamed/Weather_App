@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -12,6 +13,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.TextView
+import android.widget.Toast
+import androidx.lifecycle.MutableLiveData
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -29,6 +32,9 @@ class AlertFragment : Fragment() {
 
     lateinit var binding: FragmentAlertBinding
      var desiredDateTime: Calendar? = null
+    lateinit var sharedPrefrence: SharedPreferences
+    var locationLiveData: MutableLiveData<String> = MutableLiveData()
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,8 +46,18 @@ class AlertFragment : Fragment() {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        val locationString = sharedPrefrence.getString("alertLocation", "Select Location")
+        locationLiveData.value = locationString?: "Select Location"
+    }
+
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        sharedPrefrence = requireContext().getSharedPreferences("MySharedPref", Context.MODE_PRIVATE)
+
         binding.fabAlert.setOnClickListener {
 //            val delay = 1L // Delay in minutes
 //            val inputData = Data.Builder()
@@ -64,6 +80,11 @@ class AlertFragment : Fragment() {
         // Set custom width and height for the dialog
         val width = context.resources.displayMetrics.widthPixels * 0.8 // 80% of screen width
         val height = WindowManager.LayoutParams.WRAP_CONTENT // Adjust height as needed
+        locationLiveData.observe(viewLifecycleOwner) { location ->
+            // Update the TextView's text inside the observer block
+            myCustomPopupDialogBinding.selectedLocationTextView.text = location
+        }
+
 
         // Set dialog width and height
         dialog.window?.setLayout(width.toInt(), height.toInt())
@@ -77,8 +98,7 @@ class AlertFragment : Fragment() {
             val intent = Intent(context, MapActivity::class.java)
             intent.putExtra("request_fragment", "Alert")
             context.startActivity(intent)
-            val sharedPrefrence = context.getSharedPreferences("MySharedPref", Context.MODE_PRIVATE)
-            myCustomPopupDialogBinding.selectedLocationTextView.text = sharedPrefrence.getString("alertLocation", "Select Location")
+
         }
 
         myCustomPopupDialogBinding.CalenderimageButton.setOnClickListener {
@@ -96,6 +116,7 @@ class AlertFragment : Fragment() {
             val inputData = Data.Builder()
                 .putString("title", "Weather Alert")
                 .putString("message", "It's going to rain today!")
+
                 .build()
             val alertWorker = OneTimeWorkRequestBuilder<AlertWorker>()
                 .setInputData(inputData)
@@ -103,6 +124,7 @@ class AlertFragment : Fragment() {
                 .build()
             WorkManager.getInstance(requireContext()).enqueue(alertWorker)
             dialog.dismiss()
+            Toast.makeText(context, "Alarm set at ${desiredDateTime?.time?:""}", Toast.LENGTH_SHORT).show()
         }
 
         dialog.show()
