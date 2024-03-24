@@ -28,7 +28,9 @@ class AlertWorker(appContext: Context, params: WorkerParameters) : CoroutineWork
     override suspend fun doWork(): Result {
         try {
 
-            val weatherFlow = getCurrentWeather(applicationContext,ApiConstants.alertlat,ApiConstants.alartlon ,  ApiConstants.API_KEY)
+            var lat = inputData.getString("alertLat")
+            var lon = inputData.getString("alertLon")
+            val weatherFlow = getCurrentWeather(applicationContext,lat,lon ,  ApiConstants.API_KEY)
 
             weatherFlow
                 .catch {
@@ -50,6 +52,7 @@ class AlertWorker(appContext: Context, params: WorkerParameters) : CoroutineWork
         } catch (e: Exception) {
             return Result.failure()
         }
+//        showNotification("title", "message")
         return Result.success()
     }
 

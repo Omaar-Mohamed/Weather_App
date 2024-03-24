@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -15,15 +16,27 @@ import android.view.WindowManager
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import com.example.weatherapp.R
+import com.example.weatherapp.alert.viewModel.AlertViewModel
+import com.example.weatherapp.alert.viewModel.AlertViewModelFactory
 import com.example.weatherapp.databinding.CustomPopupLayoutBinding
 import com.example.weatherapp.databinding.FragmentAlertBinding
 import com.example.weatherapp.favourit.view.MapActivity
+import com.example.weatherapp.model.AppRepoImpl
+import com.example.weatherapp.model.db.AlertDbState
+import com.example.weatherapp.model.db.AppLocalDataSourseImpL
+import com.example.weatherapp.model.dto.AlertDto
+import com.example.weatherapp.model.network.AppRemoteDataSourseImpl
 import com.example.weatherapp.shared.ApiConstants
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
@@ -31,6 +44,10 @@ import java.util.concurrent.TimeUnit
 class AlertFragment : Fragment() {
 
     lateinit var binding: FragmentAlertBinding
+    lateinit var alartAdapter: AlartAdapter
+    lateinit var alartViewModelFactory: AlertViewModelFactory
+    lateinit var alartViewModel: AlertViewModel
+    lateinit var alartLayoutManager: LinearLayoutManager
      var desiredDateTime: Calendar? = null
     lateinit var sharedPrefrence: SharedPreferences
     var locationLiveData: MutableLiveData<String> = MutableLiveData()
@@ -42,9 +59,12 @@ class AlertFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         binding = FragmentAlertBinding.inflate(inflater, container, false)
+
         return binding.root
 
     }
+
+
 
     override fun onResume() {
         super.onResume()
@@ -56,6 +76,51 @@ class AlertFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        alartAdapter = AlartAdapter(
+            action = {
+                alartViewModel.deleteAlert(it)
+                Toast.makeText(requireContext(), "Alert Deleted", Toast.LENGTH_SHORT).show()
+            }
+        )
+        alartLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        binding.recyclerViewAlert.layoutManager = alartLayoutManager
+        binding.recyclerViewAlert.adapter = alartAdapter
+        alartViewModelFactory = AlertViewModelFactory(
+            AppRepoImpl.getInstance(
+                AppRemoteDataSourseImpl, AppLocalDataSourseImpL.getInstance(requireContext())
+            )
+        )
+        alartViewModel = ViewModelProvider(this, alartViewModelFactory).get(AlertViewModel::class.java)
+        alartViewModel.getAllAlerts()
+        lifecycleScope.launch {
+            alartViewModel.alert.collectLatest {
+                when(it){
+                    is AlertDbState.Success -> {
+                        alartAdapter.submitList(it.data)
+                        Log.i("alertsResult", "onCreateView: "+it.data)
+                    }
+                    is AlertDbState.Loading -> {
+//                        binding.progressBar.visibility = View.VISIBLE
+                    }
+                    is AlertDbState.Failure -> {
+//                        binding.progressBar.visibility = View.GONE
+                        Toast.makeText(requireContext(), "Error: ${it.error}", Toast.LENGTH_SHORT).show()
+                        Log.i("alertsResult", "onCreateView: "+it.error)
+                    }
+
+                    else -> {}
+                }
+            }
+        }
+
+
+
+
+
+
+
+
         sharedPrefrence = requireContext().getSharedPreferences("MySharedPref", Context.MODE_PRIVATE)
 
         binding.fabAlert.setOnClickListener {
@@ -74,6 +139,8 @@ class AlertFragment : Fragment() {
     }
     fun showCustomPopupDialog(context: Context) {
         val dialog = Dialog(context)
+        var alartDto: AlertDto
+        var lastInsertedDto : AlertDto = AlertDto(0,"","","")
         val myCustomPopupDialogBinding = CustomPopupLayoutBinding.inflate(LayoutInflater.from(context))
         dialog.setContentView(myCustomPopupDialogBinding.root)
 
@@ -82,7 +149,12 @@ class AlertFragment : Fragment() {
         val height = WindowManager.LayoutParams.WRAP_CONTENT // Adjust height as needed
         locationLiveData.observe(viewLifecycleOwner) { location ->
             // Update the TextView's text inside the observer block
-            myCustomPopupDialogBinding.selectedLocationTextView.text = location
+            if (ApiConstants.alertlat != "" && ApiConstants.alartlon != "") {
+                myCustomPopupDialogBinding.selectedLocationTextView.text = location
+            } else {
+                myCustomPopupDialogBinding.selectedLocationTextView.text = "Select Location"
+            }
+
         }
 
 
@@ -112,21 +184,75 @@ class AlertFragment : Fragment() {
         }
         myCustomPopupDialogBinding.confirmButton.setOnClickListener {
             // Handle confirm button click
-            val delay =  desiredDateTime?.timeInMillis?.minus(System.currentTimeMillis())?.div(60000) ?: 0
-            val inputData = Data.Builder()
-                .putString("title", "Weather Alert")
-                .putString("message", "It's going to rain today!")
+            if (ApiConstants.alertlat == "" && ApiConstants.alartlon == "") {
+                Toast.makeText(context, "Please select a location", Toast.LENGTH_SHORT).show()
 
-                .build()
-            val alertWorker = OneTimeWorkRequestBuilder<AlertWorker>()
-                .setInputData(inputData)
-                .setInitialDelay(delay, TimeUnit.MINUTES)
-                .build()
-            WorkManager.getInstance(requireContext()).enqueue(alertWorker)
-            dialog.dismiss()
-            Toast.makeText(context, "Alarm set at ${desiredDateTime?.time?:""}", Toast.LENGTH_SHORT).show()
+            } else {
+                val delay =
+                    desiredDateTime?.timeInMillis?.minus(System.currentTimeMillis())?.div(60000)
+                        ?: 0
+                val inputData = Data.Builder()
+                    .putString("title", "Weather Alert")
+                    .putString("message", "It's going to rain today!")
+                    .putString("alertLat", ApiConstants.alertlat)
+                    .putString("alertLon", ApiConstants.alartlon)
+
+                    .build()
+                Log.i(
+                    "alertlonandlan",
+                    "showCustomPopupDialog: " + ApiConstants.alertlat + " " + ApiConstants.alartlon
+                )
+
+                val alertWorker = OneTimeWorkRequestBuilder<AlertWorker>()
+                    .setInputData(inputData)
+                    .setInitialDelay(delay, TimeUnit.MINUTES)
+                    .build()
+                WorkManager.getInstance(requireContext()).enqueue(alertWorker)
+                 alartDto = AlertDto(
+                    0,
+                    myCustomPopupDialogBinding.selectedLocationTextView.text.toString(),
+                    myCustomPopupDialogBinding.selectedDateTextView.text.toString(),
+                    myCustomPopupDialogBinding.selectedTimeTextView.text.toString()
+                )
+                Log.i("alartobjectid", "showCustomPopupDialog: " + alartDto.id)
+                alartViewModel.insertAlert(
+                  alartDto
+                )
+                 lifecycleScope.launch {
+                    alartViewModel.lastAlertInserted.collectLatest {
+                        when(it){
+                            is AlertDbState.Success -> {
+                                Log.i("lastInsertedAlert", "onCreateView: "+it.data)
+                                lastInsertedDto = it.data[0]
+                                Log.i("lastInsertedAlert", "showCustomPopupDialog: "+lastInsertedDto.id)
+
+                            }
+                            is AlertDbState.Loading -> {}
+                            is AlertDbState.Failure -> {}
+
+                            else -> {
+
+                            }
+                        }
+                    }
+                }
+
+                WorkManager.getInstance(context).getWorkInfoByIdLiveData(alertWorker.id)
+                    .observe(viewLifecycleOwner) { workInfo ->
+                        if (workInfo != null && workInfo.state.isFinished) {
+                            alartViewModel.deleteAlert(
+                                lastInsertedDto
+                            )
+                        }
+                    }
+                dialog.dismiss()
+                Toast.makeText(
+                    context,
+                    "Alarm set at ${desiredDateTime?.time ?: ""}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
-
         dialog.show()
     }
 

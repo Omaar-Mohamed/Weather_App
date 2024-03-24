@@ -1,6 +1,7 @@
 package com.example.weatherapp.model.db
 
 import android.content.Context
+import com.example.weatherapp.model.dto.AlertDto
 import com.example.weatherapp.model.dto.FavLocations
 import kotlinx.coroutines.flow.Flow
 
@@ -31,5 +32,25 @@ class AppLocalDataSourseImpL private constructor(private val context: Context): 
     override suspend fun getLocationsFromDb(): Flow<List<FavLocations>> {
         val appDao = AppDatabase.getInstance(context).appDao()
         return appDao.getAll()
+    }
+
+    override suspend fun insertAlart(alart: AlertDto): Long {
+       val alartDao = AppDatabase.getInstance(context).alartDao()
+        return alartDao.insertAlart(alart)
+    }
+
+    override suspend fun deleteAlart(alart: AlertDto) {
+        val alartDao = AppDatabase.getInstance(context).alartDao()
+        alartDao.deleteAlart(alart)
+    }
+
+    override suspend fun getAlartsFromDb(): Flow<List<AlertDto>> {
+        val alartDao = AppDatabase.getInstance(context).alartDao()
+        return alartDao.getAllAlarts()
+    }
+
+    override suspend fun getLastInsertedRow(): Flow<AlertDto?> {
+        val alartDao = AppDatabase.getInstance(context).alartDao()
+        return alartDao.getLastInsertedRow()
     }
 }

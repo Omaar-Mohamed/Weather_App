@@ -1,6 +1,7 @@
 package com.example.weatherapp.model
 
 import com.example.weatherapp.model.db.AppLocalDataSourse
+import com.example.weatherapp.model.dto.AlertDto
 import com.example.weatherapp.model.dto.FavLocations
 import com.example.weatherapp.model.dto.WeatherResponse
 import com.example.weatherapp.model.network.AppRemoteDataSourse
@@ -39,4 +40,22 @@ class AppRepoImpl private constructor(private val appRemoteDataSourse: AppRemote
     override suspend fun deleteLocation(location: FavLocations) {
         appLocalDataSourse.deleteLocation(location)
     }
+
+    override suspend fun getAllAlarts(): Flow<List<AlertDto>> {
+        return appLocalDataSourse.getAlartsFromDb()
+    }
+
+    override suspend fun insertAlart(alart: AlertDto): Long {
+        return appLocalDataSourse.insertAlart(alart)
+    }
+
+    override suspend fun deleteAlart(alart: AlertDto) {
+        appLocalDataSourse.deleteAlart(alart)
+    }
+
+    override suspend fun getLastInsertedRow(): Flow<AlertDto?> {
+        return appLocalDataSourse.getLastInsertedRow()
+    }
+
+
 }
