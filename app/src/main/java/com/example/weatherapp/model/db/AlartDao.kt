@@ -20,4 +20,7 @@ interface AlartDao {
 
     @Query("SELECT * FROM alerts WHERE id = (SELECT MAX(id) FROM alerts)")
      fun getLastInsertedRow(): Flow<AlertDto?>
+
+    @Query("DELETE FROM alerts WHERE id = :alertId")
+    suspend fun deleteAlartById(alertId: Long)
 }

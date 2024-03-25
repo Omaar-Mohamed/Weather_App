@@ -1,15 +1,145 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".settings.view.SettingsFragment">
+    android:layout_height="match_parent">
 
-    <!-- TODO: Update blank fragment layout -->
+    <!-- TextView for Language selection -->
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:text="settings" />
+        android:id="@+id/languageTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/language"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp" />
 
-</FrameLayout>
+    <!-- MaterialButtonToggleGroup for language selection -->
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/languageToggleGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:singleSelection="true"
+        app:checkedButton="@id/englishButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp">
+
+        <!-- English Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/englishButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="EN" />
+
+        <!-- Arabic Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/arabicButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="AR" />
+
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <!-- TextView for Theme selection -->
+    <TextView
+        android:id="@+id/themeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Theme:"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/languageToggleGroup"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp" />
+
+    <!-- MaterialButtonToggleGroup for Theme selection -->
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/themeToggleGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:singleSelection="true"
+        app:checkedButton="@id/lightThemeButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/languageToggleGroup"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp">
+
+        <!-- Light Theme Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/lightThemeButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Light" />
+
+        <!-- Dark Theme Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/darkThemeButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dark" />
+
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <!-- TextView for Temperature selection -->
+    <TextView
+        android:id="@+id/tempTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Temperature:"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/themeToggleGroup"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp" />
+
+    <!-- MaterialButtonToggleGroup for Temperature selection -->
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/tempToggleGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:singleSelection="true"
+        app:checkedButton="@id/celsiusButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/themeToggleGroup"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp">
+
+        <!-- Celsius Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/celsiusButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="C°" />
+
+        <!-- Fahrenheit Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/fahrenheitButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="F°" />
+
+        <!-- Kelvin Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/kelvinButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="K°" />
+
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

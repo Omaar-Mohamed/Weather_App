@@ -50,4 +50,10 @@ class AlertViewModel (private val repository: AppRepo) : ViewModel(){
                 }
         }
     }
+
+    fun deleteAlertById(alertId: Long){
+        viewModelScope.launch {
+            repository.deleteAlartById(alertId)
+        }
+    }
 }

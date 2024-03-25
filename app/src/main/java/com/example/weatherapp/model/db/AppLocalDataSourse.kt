@@ -14,5 +14,6 @@ interface AppLocalDataSourse {
     suspend fun getAlartsFromDb(): Flow<List<AlertDto>>
 
     suspend fun getLastInsertedRow(): Flow<AlertDto?>
+    suspend fun deleteAlartById(alertId: Long)
 
 }

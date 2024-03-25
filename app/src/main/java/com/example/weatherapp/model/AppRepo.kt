@@ -17,4 +17,6 @@ interface AppRepo {
     suspend fun deleteAlart(alart: AlertDto)
 
     suspend fun getLastInsertedRow(): Flow<AlertDto?>
+
+    suspend fun deleteAlartById(alertId: Long)
 }

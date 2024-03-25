@@ -57,5 +57,9 @@ class AppRepoImpl private constructor(private val appRemoteDataSourse: AppRemote
         return appLocalDataSourse.getLastInsertedRow()
     }
 
+    override suspend fun deleteAlartById(alertId: Long) {
+        appLocalDataSourse.deleteAlartById(alertId)
+    }
+
 
 }

@@ -53,4 +53,9 @@ class AppLocalDataSourseImpL private constructor(private val context: Context): 
         val alartDao = AppDatabase.getInstance(context).alartDao()
         return alartDao.getLastInsertedRow()
     }
+
+    override suspend fun deleteAlartById(alertId: Long) {
+        val alartDao = AppDatabase.getInstance(context).alartDao()
+        alartDao.deleteAlartById(alertId)
+    }
 }
