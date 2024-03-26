@@ -10,7 +10,8 @@ class ApiConstants {
     companion object {
         const val OPENWEATHERMAP_BASE_URL = "https://api.openweathermap.org/data/3.0/"
         const val FORECAST_ENDPOINT = "onecall"
-        const val API_KEY = "ec44d57c65496e30a27e3c71bac5eaff"
+//        const val API_KEY = "ec44d57c65496e30a27e3c71bac5eaff"
+        const val API_KEY = "172e0cbb3264b27530f5b6c425ffb29d"
         var lat: String ? = null
         var lon: String ? = null
         var address = "San Francisco"

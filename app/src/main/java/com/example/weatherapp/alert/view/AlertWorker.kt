@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import android.telecom.Call
+import android.util.Log
 import android.view.WindowInsetsAnimation
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContentProviderCompat.requireContext
@@ -27,9 +28,10 @@ import kotlinx.coroutines.withContext
 class AlertWorker(appContext: Context, params: WorkerParameters) : CoroutineWorker(appContext, params) {
     override suspend fun doWork(): Result {
         try {
-
+            var lastIndex = inputData.getLong("lastIndex", 0)
             var lat = inputData.getString("alertLat")
             var lon = inputData.getString("alertLon")
+            Log.i("lastIndexin", "doWork: ${lastIndex}")
             val weatherFlow = getCurrentWeather(applicationContext,lat,lon ,  ApiConstants.API_KEY)
 
             weatherFlow
@@ -46,6 +48,7 @@ class AlertWorker(appContext: Context, params: WorkerParameters) : CoroutineWork
 
 
                 showNotification(x, ApiConstants.splitTimeZone(weatherData.timezone))
+                    deleteAlertById(applicationContext, lastIndex)
 
                 Result.success()
             }
@@ -102,5 +105,11 @@ class AlertWorker(appContext: Context, params: WorkerParameters) : CoroutineWork
         return AppRepoImpl.getInstance(
             AppRemoteDataSourseImpl, AppLocalDataSourseImpL.getInstance(thisappContext)
         ).getWeather(lat ?: "", lon ?: "", apiKey)
+    }
+
+    private suspend fun deleteAlertById(thisappContext: Context, alertId: Long) {
+        AppRepoImpl.getInstance(
+            AppRemoteDataSourseImpl, AppLocalDataSourseImpL.getInstance(thisappContext)
+        ).deleteAlartById(alertId)
     }
 }

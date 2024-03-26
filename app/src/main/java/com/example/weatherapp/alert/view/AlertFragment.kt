@@ -39,6 +39,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
+import kotlin.math.log
 
 
 class AlertFragment : Fragment() {
@@ -51,6 +52,7 @@ class AlertFragment : Fragment() {
      var desiredDateTime: Calendar? = null
     lateinit var sharedPrefrence: SharedPreferences
     var locationLiveData: MutableLiveData<String> = MutableLiveData()
+     var lastindex: Long = 0
 
 
     override fun onCreateView(
@@ -94,11 +96,17 @@ class AlertFragment : Fragment() {
         alartViewModel = ViewModelProvider(this, alartViewModelFactory).get(AlertViewModel::class.java)
         alartViewModel.getAllAlerts()
         lifecycleScope.launch {
-            alartViewModel.alert.collectLatest {
+            alartViewModel.alert.collect {
                 when(it){
                     is AlertDbState.Success -> {
                         alartAdapter.submitList(it.data)
-                        Log.i("alertsResult", "onCreateView: "+it.data)
+//                        if (it.data.isNotEmpty()){
+//                            lastindex = it.data.last().id +1
+//                         Log.i("alertsResult", "onCreateView: "+it.data.last().id)
+//
+//                        }else {
+////                        lastindex = it.data.last().id +1
+//                        }
                     }
                     is AlertDbState.Loading -> {
 //                        binding.progressBar.visibility = View.VISIBLE
@@ -113,11 +121,6 @@ class AlertFragment : Fragment() {
                 }
             }
         }
-
-
-
-
-
 
 
 
@@ -188,63 +191,114 @@ class AlertFragment : Fragment() {
                 Toast.makeText(context, "Please select a location", Toast.LENGTH_SHORT).show()
 
             } else {
-                val delay =
-                    desiredDateTime?.timeInMillis?.minus(System.currentTimeMillis())?.div(60000)
-                        ?: 0
-                val inputData = Data.Builder()
-                    .putString("title", "Weather Alert")
-                    .putString("message", "It's going to rain today!")
-                    .putString("alertLat", ApiConstants.alertlat)
-                    .putString("alertLon", ApiConstants.alartlon)
-
-                    .build()
-                Log.i(
-                    "alertlonandlan",
-                    "showCustomPopupDialog: " + ApiConstants.alertlat + " " + ApiConstants.alartlon
-                )
-
-                val alertWorker = OneTimeWorkRequestBuilder<AlertWorker>()
-                    .setInputData(inputData)
-                    .setInitialDelay(delay, TimeUnit.MINUTES)
-                    .build()
-                WorkManager.getInstance(requireContext()).enqueue(alertWorker)
-                 alartDto = AlertDto(
+                alartDto = AlertDto(
                     0,
                     myCustomPopupDialogBinding.selectedLocationTextView.text.toString(),
                     myCustomPopupDialogBinding.selectedDateTextView.text.toString(),
                     myCustomPopupDialogBinding.selectedTimeTextView.text.toString()
                 )
-                Log.i("alartobjectid", "showCustomPopupDialog: " + alartDto.id)
-                alartViewModel.insertAlert(
-                  alartDto
-                )
-                 lifecycleScope.launch {
-                    alartViewModel.lastAlertInserted.collectLatest {
-                        when(it){
-                            is AlertDbState.Success -> {
-                                Log.i("lastInsertedAlert", "onCreateView: "+it.data)
-                                lastInsertedDto = it.data[0]
-                                Log.i("lastInsertedAlert", "showCustomPopupDialog: "+lastInsertedDto.id)
 
-                            }
-                            is AlertDbState.Loading -> {}
-                            is AlertDbState.Failure -> {}
+                lifecycleScope.launch {
+                    val delay =
+                        desiredDateTime?.timeInMillis?.minus(System.currentTimeMillis())?.div(60000)
+                            ?: 0
+                    val insertedId = alartViewModel.insertAlert(alartDto)
+                    // Now you have the inserted ID
+                    lastindex = insertedId
+                    Log.i("lastIndexinInsert", "showCustomPopupDialog: ${lastindex}")
+                    val inputData = Data.Builder()
+                        .putString("title", "Weather Alert")
+                        .putString("message", "It's going to rain today!")
+                        .putString("alertLat", ApiConstants.alertlat)
+                        .putString("alertLon", ApiConstants.alartlon)
 
-                            else -> {
+                        .putLong("lastIndex" , lastindex)
 
-                            }
-                        }
-                    }
+                        .build()
+                    val alertWorker = OneTimeWorkRequestBuilder<AlertWorker>()
+                        .setInputData(inputData)
+                        .setInitialDelay(delay, TimeUnit.MINUTES)
+                        .build()
+                    WorkManager.getInstance(requireContext()).enqueue(alertWorker)
                 }
 
-                WorkManager.getInstance(context).getWorkInfoByIdLiveData(alertWorker.id)
-                    .observe(viewLifecycleOwner) { workInfo ->
-                        if (workInfo != null && workInfo.state.isFinished) {
-                            alartViewModel.deleteAlert(
-                                lastInsertedDto
-                            )
-                        }
-                    }
+//                lifecycleScope.launch {
+//                    alartViewModel.alert.collect {
+//                        when (it) {
+//                            is AlertDbState.Success -> {
+//                                alartAdapter.submitList(it.data)
+//                                if (it.data.isNotEmpty()) {
+//                                    lastindex = it.data.last().id + 1
+//                                    Log.i("alertsResult", "onCreateView: " + it.data.last().id)
+//
+//                                } else {
+////                        lastindex = it.data.last().id +1
+//                                }
+//                            }
+//
+//                            else -> {}
+//                        }
+//                    }
+//                }
+
+                Log.i("lastIndex", "showCustomPopupDialog: "+lastindex)
+//                val inputData = Data.Builder()
+//                    .putString("title", "Weather Alert")
+//                    .putString("message", "It's going to rain today!")
+//                    .putString("alertLat", ApiConstants.alertlat)
+//                    .putString("alertLon", ApiConstants.alartlon)
+//
+//                    .putLong("lastIndex" , lastindex)
+//
+//                    .build()
+                Log.i(
+                    "alertlonandlan",
+                    "showCustomPopupDialog: " + ApiConstants.alertlat + " " + ApiConstants.alartlon
+                )
+
+//                val alertWorker = OneTimeWorkRequestBuilder<AlertWorker>()
+//                    .setInputData(inputData)
+//                    .setInitialDelay(delay, TimeUnit.MINUTES)
+//                    .build()
+//                WorkManager.getInstance(requireContext()).enqueue(alertWorker)
+
+
+
+                Log.i("alartobjectid", "showCustomPopupDialog: " + alartDto.id)
+
+
+
+
+
+
+//                 lifecycleScope.launch {
+//                    alartViewModel.lastAlertInserted.collectLatest {
+//                        when(it){
+//                            is AlertDbState.Success -> {
+//                                Log.i("lastInserted", "onCreateView: "+it.data)
+//                                Toast.makeText(context, "Alert Inserted ${it.data[0]}" , Toast.LENGTH_SHORT).show()
+//                                lastInsertedDto = it.data[0]
+//                                Log.i("lastInsertedAlert", "showCustomPopupDialog: "+lastInsertedDto.id)
+//
+//                            }
+//                            is AlertDbState.Loading -> {}
+//                            is AlertDbState.Failure -> {}
+//
+//                            else -> {
+//
+//                            }
+//                        }
+//                    }
+//                }
+
+//                WorkManager.getInstance(context).getWorkInfoByIdLiveData(alertWorker.id)
+//                    .observe(viewLifecycleOwner) { workInfo ->
+//                        if (workInfo != null && workInfo.state.isFinished) {
+//                            alartViewModel.deleteAlert(
+//                                lastInsertedDto
+//                            )
+//                        }
+//                    }
                 dialog.dismiss()
                 Toast.makeText(
                     context,
@@ -280,6 +334,7 @@ class AlertFragment : Fragment() {
             month,
             day
         )
+        datePickerDialog.datePicker.minDate = System.currentTimeMillis()
         datePickerDialog.show()
     }
 
@@ -291,6 +346,7 @@ class AlertFragment : Fragment() {
         val timePickerDialog = TimePickerDialog(
             context,
             { _, selectedHour, selectedMinute ->
+
                 // Update desiredDateTime with the selected time
                 desiredDateTime?.set(Calendar.HOUR_OF_DAY, selectedHour)
                 desiredDateTime?.set(Calendar.MINUTE, selectedMinute)
@@ -304,6 +360,7 @@ class AlertFragment : Fragment() {
             minute,
             true
         )
+
         timePickerDialog.show()
     }
 
