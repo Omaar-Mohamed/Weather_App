@@ -32,26 +32,33 @@ class AlertWorker(appContext: Context, params: WorkerParameters) : CoroutineWork
             var lat = inputData.getString("alertLat")
             var lon = inputData.getString("alertLon")
             Log.i("lastIndexin", "doWork: ${lastIndex}")
-            val weatherFlow = getCurrentWeather(applicationContext,lat,lon ,  ApiConstants.API_KEY)
+            val weatherFlow = getCurrentWeather(applicationContext, lat, lon, ApiConstants.API_KEY)
 
             weatherFlow
-                .catch {
-                    e ->
-                     Result.failure()
+                .catch { e ->
+                    Result.failure()
                 }
                 .collect { weatherData ->
 
-                createNotificationChannels()
+                    createNotificationChannels()
 
-                val x = inputData.getString("title")
-                val y = inputData.getString("message")
+                    val x = inputData.getString("Weather Alert")
+                    val y = inputData.getString("message")
+                    if (weatherData.current.weather[0].main == WeatherState.VALUE1.value) {
+                        showNotification(x, "weather in ${ApiConstants.splitTimeZone(weatherData.timezone)} is thunderstorm")
+                    } else if (weatherData.current.weather[0].main == WeatherState.VALUE2.value) {
+                        showNotification(x, "weather in ${ApiConstants.splitTimeZone(weatherData.timezone)} is mist")
+                    } else if (weatherData.current.weather[0].main == WeatherState.VALUE3.value) {
+                        showNotification(x, "weather in ${ApiConstants.splitTimeZone(weatherData.timezone)} is snow")
+                    }else{
+                        showNotification(x , "weather in ${ApiConstants.splitTimeZone(weatherData.timezone)} is clear")
+                    }
 
-
-                showNotification(x, ApiConstants.splitTimeZone(weatherData.timezone))
+//                    showNotification(x, ApiConstants.splitTimeZone(weatherData.timezone))
                     deleteAlertById(applicationContext, lastIndex)
 
-                Result.success()
-            }
+                    Result.success()
+                }
         } catch (e: Exception) {
             return Result.failure()
         }
@@ -77,7 +84,7 @@ class AlertWorker(appContext: Context, params: WorkerParameters) : CoroutineWork
         }
     }
 
-    private fun showNotification( title: String?, message: String?) {
+    private fun showNotification(title: String?, message: String?) {
         val notificationManager =
             applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -100,7 +107,12 @@ class AlertWorker(appContext: Context, params: WorkerParameters) : CoroutineWork
         notificationManager.notify(notificationId, notificationBuilder.build())
     }
 
-    private suspend fun getCurrentWeather(thisappContext: Context, lat: String?, lon: String?, apiKey: String): Flow<WeatherResponse> {
+    private suspend fun getCurrentWeather(
+        thisappContext: Context,
+        lat: String?,
+        lon: String?,
+        apiKey: String
+    ): Flow<WeatherResponse> {
         // Get the current weather data
         return AppRepoImpl.getInstance(
             AppRemoteDataSourseImpl, AppLocalDataSourseImpL.getInstance(thisappContext)
@@ -111,5 +123,11 @@ class AlertWorker(appContext: Context, params: WorkerParameters) : CoroutineWork
         AppRepoImpl.getInstance(
             AppRemoteDataSourseImpl, AppLocalDataSourseImpL.getInstance(thisappContext)
         ).deleteAlartById(alertId)
+    }
+
+    enum class WeatherState(val value: String) {
+        VALUE1("thunderstorm"),
+        VALUE2("mist"),
+        VALUE3("snow"),
     }
 }

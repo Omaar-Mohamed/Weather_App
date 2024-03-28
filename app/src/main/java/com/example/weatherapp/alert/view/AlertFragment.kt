@@ -1,7 +1,10 @@
 package com.example.weatherapp.alert.view
 
+import android.annotation.SuppressLint
+import android.app.AlarmManager
 import android.app.DatePickerDialog
 import android.app.Dialog
+import android.app.PendingIntent
 import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
@@ -200,7 +203,7 @@ class AlertFragment : Fragment() {
 
                 lifecycleScope.launch {
                     val delay =
-                        desiredDateTime?.timeInMillis?.minus(System.currentTimeMillis())?.div(60000)
+                        desiredDateTime?.timeInMillis?.minus(System.currentTimeMillis())?.plus(10000)?.div(60000)
                             ?: 0
                     val insertedId = alartViewModel.insertAlert(alartDto)
                     // Now you have the inserted ID
@@ -220,6 +223,7 @@ class AlertFragment : Fragment() {
                         .setInitialDelay(delay, TimeUnit.MINUTES)
                         .build()
                     WorkManager.getInstance(requireContext()).enqueue(alertWorker)
+//                    setAlarm(ApiConstants.alartlon.toDouble(), ApiConstants.alertlat.toDouble(), desiredDateTime!!.timeInMillis, lastindex)
                 }
 
 //                lifecycleScope.launch {
@@ -363,5 +367,19 @@ class AlertFragment : Fragment() {
 
         timePickerDialog.show()
     }
-
+    @SuppressLint("ScheduleExactAlarm")
+    fun setAlarm(long:Double, lat:Double, alertTime: Long, lastIndex: Long)
+    {
+//        Log.i("TAG", "setAlarm: $locationAlert")
+        val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as? AlarmManager
+        val alarmIntent = Intent(context,AlarmReciver::class.java)
+        alarmIntent.apply {
+            putExtra("id",lastIndex)
+            putExtra("lat",lat)
+            putExtra("long",long)
+        }
+        val pendingIntent = PendingIntent.getBroadcast(context,7,alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        alarmManager?.setExact(AlarmManager.RTC_WAKEUP,alertTime,pendingIntent)
+        Log.i("TAG", "setAlarm: helloo")
+    }
 }
