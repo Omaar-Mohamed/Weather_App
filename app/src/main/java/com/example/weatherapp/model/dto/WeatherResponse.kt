@@ -47,7 +47,7 @@ data class Weather(
 
 data class Minutely(
     val dt: Long,
-    val precipitation: Long,
+    val precipitation: Double,
 )
 
 data class Hourly(

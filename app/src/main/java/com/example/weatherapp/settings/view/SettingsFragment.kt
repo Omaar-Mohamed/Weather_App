@@ -1,5 +1,7 @@
 package com.example.weatherapp.settings.view
 
+import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -11,10 +13,13 @@ import com.example.weatherapp.R
 import com.example.weatherapp.databinding.FragmentSettingsBinding
 import com.google.android.material.button.MaterialButtonToggleGroup
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 
 class SettingsFragment : Fragment() {
     lateinit var binding: FragmentSettingsBinding
+    lateinit var selectedLanguage: String // Declare the property
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,36 +33,39 @@ class SettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        selectedLanguage = getSelectedLanguage(requireContext()) // Get the selected language from shared preferences
+        when (selectedLanguage) {
+            "en" -> binding.englishButton.isChecked = true
+            "ar" -> binding.arabicButton.isChecked = true
+        }
         // Language toggle group listener
         binding.languageToggleGroup.addOnButtonCheckedListener { group, checkedId, isChecked ->
             if (isChecked) {
                 when (checkedId) {
                     R.id.englishButton -> {
-                        LanguageManager.setLanguage(Language.ENGLISH)
+                        Toast.makeText(
+                            requireContext(),
+                            "Selected language: English",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        saveSelectedLanguage(requireContext(), "en")
+                        changeLanguage(getSelectedLanguage(requireContext()))
+
                     }
+
                     R.id.arabicButton -> {
-                        LanguageManager.setLanguage(Language.ARABIC)
+                        Toast.makeText(
+                            requireContext(),
+                            "Selected language: Arabic",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        saveSelectedLanguage(requireContext(), "ar")
+                        changeLanguage(getSelectedLanguage(requireContext()))
+
                     }
                 }
             }
-        }
-        lifecycleScope.launch {
-            LanguageManager.languageFlow.collect { language ->
-                // Update UI with the new language
-                when (language) {
-                    Language.ENGLISH -> {
-                        // Update text for English language
-                        binding.languageTextView.text = getString(R.string.language)
-                        // Update other UI elements for English language if needed
-                    }
-                    Language.ARABIC -> {
-                        // Update text for Arabic language
-//                        binding.languageTextView.text = getString(R.string.language_arabic)
-                        // Update other UI elements for Arabic language if needed
-                    }
-                }
-            }
+
         }
 
 
@@ -77,4 +85,31 @@ class SettingsFragment : Fragment() {
 //            }
 //        }
     }
+
+    private fun changeLanguage(languageCode: String) {
+        val locale = Locale(languageCode)
+        Locale.setDefault(locale)
+
+        val config = Configuration(resources.configuration)
+        config.setLocale(locale)
+
+        resources.updateConfiguration(config, resources.displayMetrics)
+
+        // Recreate the activity to apply the language change
+//        requireActivity().recreate()
+    }
+
+    fun saveSelectedLanguage(context: Context, languageCode: String) {
+        val sharedPref = context.getSharedPreferences("MySharedPref", Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putString("selectedLanguage", languageCode)
+            apply()
+        }
+    }
+
+    fun getSelectedLanguage(context: Context): String {
+        val sharedPref = context.getSharedPreferences("MySharedPref", Context.MODE_PRIVATE)
+        return sharedPref.getString("selectedLanguage", "en") ?: "en" // Default to 'en' if not set
+    }
+
 }

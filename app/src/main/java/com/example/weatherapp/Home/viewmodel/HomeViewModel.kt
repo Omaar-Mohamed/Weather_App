@@ -15,9 +15,9 @@ class HomeViewModel(private val appRepo: AppRepo) : ViewModel() {
    private val _weather : MutableStateFlow<ApiState> = MutableStateFlow(ApiState.Loading)
     val weather : StateFlow<ApiState> = _weather
 
-    fun getWeather(lat: String, lon: String, apiKey: String) {
+    fun getWeather(lat: String, lon: String, apiKey: String , language:String) {
         viewModelScope.launch {
-            appRepo.getWeather(lat, lon, apiKey)
+            appRepo.getWeather(lat, lon, apiKey , language)
                 .catch { e ->
                     _weather.value = ApiState.Failure(e)
                 }.collect {

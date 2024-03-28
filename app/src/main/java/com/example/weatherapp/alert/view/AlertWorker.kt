@@ -3,6 +3,7 @@ package com.example.weatherapp.alert.view
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Build
 import android.telecom.Call
 import android.util.Log
@@ -18,11 +19,13 @@ import com.example.weatherapp.model.db.AppLocalDataSourseImpL
 import com.example.weatherapp.model.dto.WeatherResponse
 import com.example.weatherapp.model.network.AppRemoteDataSourseImpl
 import com.example.weatherapp.shared.ApiConstants
+import com.example.weatherapp.shared.SharedViewModel
 import com.google.android.gms.common.api.Response
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.withContext
 
 class AlertWorker(appContext: Context, params: WorkerParameters) : CoroutineWorker(appContext, params) {
@@ -32,7 +35,9 @@ class AlertWorker(appContext: Context, params: WorkerParameters) : CoroutineWork
             var lat = inputData.getString("alertLat")
             var lon = inputData.getString("alertLon")
             Log.i("lastIndexin", "doWork: ${lastIndex}")
-            val weatherFlow = getCurrentWeather(applicationContext, lat, lon, ApiConstants.API_KEY)
+            var language = ApiConstants.getSelectedLanguage(applicationContext)
+
+            val weatherFlow = getCurrentWeather(applicationContext, lat, lon, ApiConstants.API_KEY , language)
 
             weatherFlow
                 .catch { e ->
@@ -111,12 +116,13 @@ class AlertWorker(appContext: Context, params: WorkerParameters) : CoroutineWork
         thisappContext: Context,
         lat: String?,
         lon: String?,
-        apiKey: String
+        apiKey: String,
+        language:String
     ): Flow<WeatherResponse> {
         // Get the current weather data
         return AppRepoImpl.getInstance(
             AppRemoteDataSourseImpl, AppLocalDataSourseImpL.getInstance(thisappContext)
-        ).getWeather(lat ?: "", lon ?: "", apiKey)
+        ).getWeather(lat ?: "", lon ?: "", apiKey , language)
     }
 
     private suspend fun deleteAlertById(thisappContext: Context, alertId: Long) {

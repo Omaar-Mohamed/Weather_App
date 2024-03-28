@@ -102,7 +102,7 @@ class AlarmReciver : BroadcastReceiver() {
         // Get the current weather data
         return AppRepoImpl.getInstance(
             AppRemoteDataSourseImpl, AppLocalDataSourseImpL.getInstance(thisappContext)
-        ).getWeather(lat ?: "", lon ?: "", apiKey)
+        ).getWeather(lat ?: "", lon ?: "", apiKey , "en")
     }
 
     private suspend fun deleteAlertById(thisappContext: Context, alertId: Long) {

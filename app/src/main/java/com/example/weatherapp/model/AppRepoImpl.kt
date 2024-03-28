@@ -24,9 +24,10 @@ class AppRepoImpl private constructor(private val appRemoteDataSourse: AppRemote
     override suspend fun getWeather(
         lat: String,
         lon: String,
-        apiKey: String
+        apiKey: String,
+        language: String
     ): Flow<WeatherResponse> {
-        return appRemoteDataSourse.getWeather(lat, lon, apiKey)
+        return appRemoteDataSourse.getWeather(lat, lon, apiKey , language)
     }
 
     override suspend fun getAllLocations(): Flow<List<FavLocations>> {

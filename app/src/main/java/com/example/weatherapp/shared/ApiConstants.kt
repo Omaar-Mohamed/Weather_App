@@ -1,5 +1,6 @@
 package com.example.weatherapp.shared
 
+import android.content.Context
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -71,6 +72,18 @@ class ApiConstants {
         fun kelvinToCelsiusToAdapter(kelvin: Double): String {
             val celsius = kelvin - 273.15
             return String.format("%.0f°C", celsius)
+        }
+        fun saveSelectedLanguage(context: Context, languageCode: String) {
+            val sharedPref = context.getSharedPreferences("MySharedPref", Context.MODE_PRIVATE)
+            with(sharedPref.edit()) {
+                putString("selectedLanguage", languageCode)
+                apply()
+            }
+        }
+
+        fun getSelectedLanguage(context: Context): String {
+            val sharedPref = context.getSharedPreferences("MySharedPref", Context.MODE_PRIVATE)
+            return sharedPref.getString("selectedLanguage", "en") ?: "en" // Default to 'en' if not set
         }
     }
 }

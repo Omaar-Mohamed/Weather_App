@@ -10,6 +10,7 @@ interface NetworkServices {
     suspend fun getWeather(
         @Query("lat") lan: String,
         @Query("lon") lon: String,
-        @Query("appid") apiKey: String
+        @Query("appid") apiKey: String,
+        @Query("lang") language: String
     ): WeatherResponse
 }

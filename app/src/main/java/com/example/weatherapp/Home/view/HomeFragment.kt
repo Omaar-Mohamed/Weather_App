@@ -22,6 +22,7 @@ import com.example.weatherapp.model.db.AppLocalDataSourseImpL
 import com.example.weatherapp.model.network.ApiState
 import com.example.weatherapp.model.network.AppRemoteDataSourseImpl
 import com.example.weatherapp.shared.ApiConstants
+import com.example.weatherapp.shared.SharedViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -35,6 +36,8 @@ class HomeFragment : Fragment() {
     lateinit var hourlyAdapter: HourlyAdapter
     lateinit var dailyLayoutManager: LinearLayoutManager
     lateinit var dailyAdapter: DailyAdapter
+    lateinit var sharedViewModel: SharedViewModel
+     var language : String = "ar"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -65,6 +68,14 @@ class HomeFragment : Fragment() {
         homeviewModel = ViewModelProvider(this, homeViewModelFactory).get(HomeViewModel::class.java)
 
         // Start fetching weather data
+        sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
+
+        lifecycleScope.launch {
+            sharedViewModel.languageFlow.collectLatest {
+//                Log.i("response weather", "onCreateView:  $it" )
+                language = it
+            }
+        }
 
         if (ApiConstants.lat == null && ApiConstants.lon == null) {
             Toast.makeText(requireContext(), "Location not found", Toast.LENGTH_SHORT).show()
@@ -72,7 +83,8 @@ class HomeFragment : Fragment() {
             homeviewModel.getWeather(
                 ApiConstants.lat!!,
                 ApiConstants.lon!!,
-                ApiConstants.API_KEY
+                ApiConstants.API_KEY,
+                language
             )
 //            Toast.makeText(requireContext(), ApiConstants.address, Toast.LENGTH_SHORT).show()
         }
@@ -105,6 +117,7 @@ class HomeFragment : Fragment() {
                 }
             }
         }
+
     }
     fun splitTimeZone(timezone: String) : String{
 
