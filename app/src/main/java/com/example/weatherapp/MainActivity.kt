@@ -3,6 +3,7 @@ package com.example.weatherapp
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.location.Address
 import android.location.Geocoder
 import android.os.Build
@@ -13,12 +14,16 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
+import androidx.core.view.ViewCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.ActivityMainBinding
 import com.example.weatherapp.shared.ApiConstants
+import com.example.weatherapp.shared.SharedViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -26,6 +31,8 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.material.navigation.NavigationView
+import kotlinx.coroutines.launch
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,6 +43,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var fusedClient: FusedLocationProviderClient
     lateinit var locationRequest: LocationRequest
     private var hasNavigatedToHome = false // Flag to track navigation to HomeFragment
+    lateinit var sharedViewModel: SharedViewModel
 
 
 
@@ -80,6 +88,26 @@ class MainActivity : AppCompatActivity() {
         binding.toolbar.setNavigationIcon(R.drawable.icons8_menu)
 
         drawerLayout = binding.drawerLayout
+        sharedViewModel = ViewModelProvider(this@MainActivity).get(SharedViewModel::class.java)
+
+        lifecycleScope.launch {
+            sharedViewModel.languageFlow.collect { language ->
+                if (language == "en") {
+                    drawerLayout.layoutDirection = DrawerLayout.LAYOUT_DIRECTION_LTR
+//                    ViewCompat.LAYOUT_DIRECTION_LTR
+                    setLocale("en")
+
+//                    recreate()
+
+                } else {
+                    drawerLayout.layoutDirection = DrawerLayout.LAYOUT_DIRECTION_RTL
+//                    ViewCompat.LAYOUT_DIRECTION_RTL
+                    setLocale("ar")
+//                    recreate()
+                }
+
+            }
+        }
         navigationView = binding.navView
         binding.toolbar.setNavigationOnClickListener {
             drawerLayout.openDrawer(navigationView)
@@ -193,4 +221,14 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
         }
     }
+
+    private fun setLocale(language: String) {
+        val locale = Locale(language)
+        Locale.setDefault(locale)
+        val configuration = Configuration(resources.configuration)
+        configuration.setLocale(locale)
+        val context = applicationContext.createConfigurationContext(configuration)
+
+    }
+
     }

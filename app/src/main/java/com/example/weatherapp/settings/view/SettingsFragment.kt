@@ -8,9 +8,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.FragmentSettingsBinding
+import com.example.weatherapp.shared.SharedViewModel
 import com.google.android.material.button.MaterialButtonToggleGroup
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -19,6 +22,7 @@ import java.util.Locale
 class SettingsFragment : Fragment() {
     lateinit var binding: FragmentSettingsBinding
     lateinit var selectedLanguage: String // Declare the property
+    lateinit var sharedViewModel: SharedViewModel
 
 
     override fun onCreateView(
@@ -34,6 +38,7 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         selectedLanguage = getSelectedLanguage(requireContext()) // Get the selected language from shared preferences
+        sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
         when (selectedLanguage) {
             "en" -> binding.englishButton.isChecked = true
             "ar" -> binding.arabicButton.isChecked = true
@@ -49,7 +54,18 @@ class SettingsFragment : Fragment() {
                             Toast.LENGTH_SHORT
                         ).show()
                         saveSelectedLanguage(requireContext(), "en")
-                        changeLanguage(getSelectedLanguage(requireContext()))
+//                        changeLanguage(getSelectedLanguage(requireContext()))
+                        sharedViewModel.setLanguage("en")
+                        lifecycleScope.launch {
+                            sharedViewModel.languageFlow.collect { language ->
+                                setLocale(language)
+                            }
+
+
+                        }
+//                        activity?.recreate()
+                        this.findNavController().navigate(R.id.settingsFragment)
+
 
                     }
 
@@ -60,7 +76,16 @@ class SettingsFragment : Fragment() {
                             Toast.LENGTH_SHORT
                         ).show()
                         saveSelectedLanguage(requireContext(), "ar")
-                        changeLanguage(getSelectedLanguage(requireContext()))
+//                        changeLanguage(getSelectedLanguage(requireContext()))
+                        sharedViewModel.setLanguage("ar")
+                        lifecycleScope.launch {
+                            sharedViewModel.languageFlow.collect { language ->
+                                setLocale(language)
+
+                            }
+                        }
+
+                        this.findNavController().navigate(R.id.settingsFragment)
 
                     }
                 }
@@ -86,17 +111,12 @@ class SettingsFragment : Fragment() {
 //        }
     }
 
-    private fun changeLanguage(languageCode: String) {
-        val locale = Locale(languageCode)
+    private fun setLocale(language: String) {
+        val locale = Locale(language)
         Locale.setDefault(locale)
-
-        val config = Configuration(resources.configuration)
+        val config = Configuration()
         config.setLocale(locale)
-
         resources.updateConfiguration(config, resources.displayMetrics)
-
-        // Recreate the activity to apply the language change
-//        requireActivity().recreate()
     }
 
     fun saveSelectedLanguage(context: Context, languageCode: String) {
@@ -111,5 +131,6 @@ class SettingsFragment : Fragment() {
         val sharedPref = context.getSharedPreferences("MySharedPref", Context.MODE_PRIVATE)
         return sharedPref.getString("selectedLanguage", "en") ?: "en" // Default to 'en' if not set
     }
+
 
 }

@@ -104,7 +104,7 @@ class HomeFragment : Fragment() {
                     is ApiState.Success -> {
                         // Handle success state
                         // binding.progressBar.visibility = View.GONE
-                        Log.i("response weather", "onCreateView:  ${it.data.lat}" )
+                        Log.i("response weather", "onCreateView:  ${it.data}" )
                         Log.i("response weather", "onCreateView:  ${it.data.hourly}" )
                         Glide.with(requireContext()).load("https://openweathermap.org/img/wn/${it.data.current.weather[0].icon}.png").into(
                         binding.imageViewWeatherIcon)

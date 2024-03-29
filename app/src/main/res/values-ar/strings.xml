@@ -6,4 +6,10 @@
     <string name="settings">الاعدادات</string>
     <string name="alert">المنبه</string>
     <string name="language">:اللغة</string>
+    <string name="app_name">تطبيق المناخ</string>
+    <string name="theme">الوضع:</string>
+    <string name="light">ساطع</string>
+    <string name="dark">داكن</string>
+    <string name="temperature">درجة الحراره:</string>
+
 </resources>

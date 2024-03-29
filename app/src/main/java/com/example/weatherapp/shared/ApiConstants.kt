@@ -85,5 +85,6 @@ class ApiConstants {
             val sharedPref = context.getSharedPreferences("MySharedPref", Context.MODE_PRIVATE)
             return sharedPref.getString("selectedLanguage", "en") ?: "en" // Default to 'en' if not set
         }
+
     }
 }
