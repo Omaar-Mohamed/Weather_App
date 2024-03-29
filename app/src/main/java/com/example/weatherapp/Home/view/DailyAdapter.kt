@@ -47,7 +47,7 @@ class DailyAdapter : ListAdapter<Daily , DailyAdapter.DailyViewHolder>(DailyDiff
                 Glide.with(itemView.context)
                     .load(ApiConstants.getWeatherIconUrl(daily.weather[0].icon))
                     .into(imgWeather)
-                txtWeather.text = daily.weather[0].main
+                txtWeather.text = daily.weather[0].description
 
             }
         }

@@ -46,7 +46,7 @@ class HourlyAdapter : ListAdapter<Hourly, HourlyAdapter.HourlyViewHolder>(Hourly
             Glide.with(itemView.context)
                 .load(ApiConstants.getWeatherIconUrl(hourly.weather[0].icon))
                 .into(imgWeather)
-            txtWeather.text = hourly.weather[0].main
+            txtWeather.text = hourly.weather[0].description
                 txtDegree.text = ApiConstants.kelvinToCelsiusToAdapter(hourly.temp)
         }
     }
