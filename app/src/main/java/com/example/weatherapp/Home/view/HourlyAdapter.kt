@@ -1,5 +1,6 @@
 package com.example.weatherapp.Home.view
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -47,7 +48,20 @@ class HourlyAdapter : ListAdapter<Hourly, HourlyAdapter.HourlyViewHolder>(Hourly
                 .load(ApiConstants.getWeatherIconUrl(hourly.weather[0].icon))
                 .into(imgWeather)
             txtWeather.text = hourly.weather[0].description
-                txtDegree.text = ApiConstants.kelvinToCelsiusToAdapter(hourly.temp)
+            var language = ApiConstants.getSelectedLanguage(itemView.context)
+            Log.i("degreehoulry", "bind: ${ApiConstants.getSelectedDegree(itemView.context)}")
+            txtDegree.text = when (val selectedDegree = ApiConstants.getSelectedDegree(itemView.context)) {
+                "metric" -> String.format("%.0f°C", hourly.temp)
+                "imperial" -> String.format("%.0f°F", hourly.temp)
+                "standard" -> String.format("%.0f°", hourly.temp)
+                else -> {
+                    // Handle unknown degree types gracefully
+                    "Unknown degree type: $selectedDegree"
+                }
+            }
+
+
+
         }
     }
 }

@@ -6,7 +6,7 @@ import com.example.weatherapp.model.dto.WeatherResponse
 import kotlinx.coroutines.flow.Flow
 
 interface AppRepo {
-    suspend fun getWeather(lat: String, lon: String, apiKey: String , language:String): Flow<WeatherResponse>
+    suspend fun getWeather(lat: String, lon: String, apiKey: String , language:String , units:String): Flow<WeatherResponse>
 
     suspend fun getAllLocations(): Flow<List<FavLocations>>
     suspend fun insertLocation(location: FavLocations): Long

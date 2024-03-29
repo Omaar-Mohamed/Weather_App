@@ -85,6 +85,17 @@ class ApiConstants {
             val sharedPref = context.getSharedPreferences("MySharedPref", Context.MODE_PRIVATE)
             return sharedPref.getString("selectedLanguage", "en") ?: "en" // Default to 'en' if not set
         }
+        fun saveSelectedDegree(context: Context, degreeCode: String) {
+            val sharedPref = context.getSharedPreferences("MySharedPref", Context.MODE_PRIVATE)
+            with(sharedPref.edit()) {
+                putString("selectedDegree", degreeCode)
+                apply()
+            }
+        }
+        fun getSelectedDegree(context: Context): String {
+            val sharedPref = context.getSharedPreferences("MySharedPref", Context.MODE_PRIVATE)
+            return sharedPref.getString("selectedDegree", "celsius") ?: "celsius" // Default to 'metric' if not set
+        }
 
 
 

@@ -42,12 +42,18 @@ class SettingsFragment : Fragment() {
 
         // Get the selected language from shared preferences
         val selectedLanguage = getSelectedLanguage(requireContext())
+        val selectedDegree = ApiConstants.getSelectedDegree(requireContext())
         sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
 
         // Set the checked state of the language buttons based on the selected language
         when (selectedLanguage) {
             "en" -> binding.englishButton.isChecked = true
             "ar" -> binding.arabicButton.isChecked = true
+        }
+        when (selectedDegree) {
+            "metric" -> binding.celsiusButton.isChecked = true
+            "imperial" -> binding.fahrenheitButton.isChecked = true
+            "standard" -> binding.kelvinButton.isChecked = true
         }
 
         // Language toggle group listener
@@ -71,6 +77,30 @@ class SettingsFragment : Fragment() {
                         // Update drawer menu items with localized strings
                         updateDrawerMenuItems(ApiConstants.getSelectedLanguage(requireContext()))
                         this.findNavController().navigate(R.id.settingsFragment)
+                    }
+                }
+            }
+        }
+        binding.tempToggleGroup.addOnButtonCheckedListener { group, checkedId, isChecked ->
+            if (isChecked) {
+                when (checkedId) {
+                    R.id.celsiusButton -> {
+                        // Save the selected language as English
+                        sharedViewModel.setDegree("metric")
+                        ApiConstants.saveSelectedDegree(requireContext(), "metric")
+                        Toast.makeText(requireContext(), "temp set on celsius", Toast.LENGTH_SHORT).show()
+                    }
+                    R.id.fahrenheitButton -> {
+                        // Save the selected language as Arabic
+                        sharedViewModel.setDegree("imperial")
+                        ApiConstants.saveSelectedDegree(requireContext(), "imperial")
+                        Toast.makeText(requireContext(), "temp set on fahrenheit", Toast.LENGTH_SHORT).show()
+                    }
+                    R.id.kelvinButton -> {
+                        // Save the selected language as Arabic
+                        sharedViewModel.setDegree("standard")
+                        ApiConstants.saveSelectedDegree(requireContext(), "standard")
+                        Toast.makeText(requireContext(), "temp set on kelvin", Toast.LENGTH_SHORT).show()
                     }
                 }
             }

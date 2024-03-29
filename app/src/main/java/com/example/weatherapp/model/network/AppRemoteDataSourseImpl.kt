@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 object  AppRemoteDataSourseImpl:AppRemoteDataSourse {
-    override suspend fun getWeather(lat: String, lon: String, apiKey: String , language:String): Flow<WeatherResponse> = flow {
-        val weather = retrofitInstance.create(NetworkServices::class.java).getWeather(lat, lon, apiKey , language)
+    override suspend fun getWeather(lat: String, lon: String, apiKey: String , language:String , units:String): Flow<WeatherResponse> = flow {
+        val weather = retrofitInstance.create(NetworkServices::class.java).getWeather(lat, lon, apiKey , language , units)
         emit(weather)
 
 

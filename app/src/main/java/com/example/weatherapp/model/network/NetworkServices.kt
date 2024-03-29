@@ -11,6 +11,7 @@ interface NetworkServices {
         @Query("lat") lan: String,
         @Query("lon") lon: String,
         @Query("appid") apiKey: String,
-        @Query("lang") language: String
+        @Query("lang") language: String,
+        @Query("units") units: String
     ): WeatherResponse
 }

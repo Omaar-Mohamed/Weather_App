@@ -40,6 +40,7 @@ class HomeFragment : Fragment() {
     lateinit var dailyAdapter: DailyAdapter
     lateinit var sharedViewModel: SharedViewModel
      var language : String = "ar"
+    var temp : String = "metric"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -83,6 +84,12 @@ class HomeFragment : Fragment() {
                 }
             }
         }
+        temp = ApiConstants.getSelectedDegree(requireContext())
+        lifecycleScope.launch{
+            sharedViewModel.degreeFlow.collectLatest {
+                temp = it
+            }
+        }
 
         if (ApiConstants.lat == null && ApiConstants.lon == null) {
             Toast.makeText(requireContext(), "Location not found", Toast.LENGTH_SHORT).show()
@@ -91,7 +98,8 @@ class HomeFragment : Fragment() {
                 ApiConstants.lat!!,
                 ApiConstants.lon!!,
                 ApiConstants.API_KEY,
-                language
+                language,
+                temp,
             )
 //            Toast.makeText(requireContext(), ApiConstants.address, Toast.LENGTH_SHORT).show()
         }
@@ -116,7 +124,11 @@ class HomeFragment : Fragment() {
                         Glide.with(requireContext()).load("https://openweathermap.org/img/wn/${it.data.current.weather[0].icon}.png").into(
                         binding.imageViewWeatherIcon)
                        binding.textViewWeatherDescription.text = splitTimeZone(it.data.timezone)
-                        binding.textViewTemperature.text = kelvinToCelsius(it.data.current.temp)
+                        binding.textViewTemperature.text = when(temp){
+                            "metric" -> it.data.current.temp.toString() + "°C"
+                            "imperial" -> it.data.current.temp.toString() + "°F"
+                            else -> it.data.current.temp.toString() + "°K"
+                        }
                         hourlyAdapter.submitList(it.data.hourly)
                         dailyAdapter.submitList(it.data.daily)
 

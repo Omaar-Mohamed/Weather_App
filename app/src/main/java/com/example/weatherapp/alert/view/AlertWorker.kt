@@ -36,8 +36,9 @@ class AlertWorker(appContext: Context, params: WorkerParameters) : CoroutineWork
             var lon = inputData.getString("alertLon")
             Log.i("lastIndexin", "doWork: ${lastIndex}")
             var language = ApiConstants.getSelectedLanguage(applicationContext)
+            var unit = ApiConstants.getSelectedDegree(applicationContext)
 
-            val weatherFlow = getCurrentWeather(applicationContext, lat, lon, ApiConstants.API_KEY , language)
+            val weatherFlow = getCurrentWeather(applicationContext, lat, lon, ApiConstants.API_KEY , language , unit)
 
             weatherFlow
                 .catch { e ->
@@ -117,12 +118,13 @@ class AlertWorker(appContext: Context, params: WorkerParameters) : CoroutineWork
         lat: String?,
         lon: String?,
         apiKey: String,
-        language:String
+        language:String,
+        unit:String
     ): Flow<WeatherResponse> {
         // Get the current weather data
         return AppRepoImpl.getInstance(
             AppRemoteDataSourseImpl, AppLocalDataSourseImpL.getInstance(thisappContext)
-        ).getWeather(lat ?: "", lon ?: "", apiKey , language)
+        ).getWeather(lat ?: "", lon ?: "", apiKey , language , unit)
     }
 
     private suspend fun deleteAlertById(thisappContext: Context, alertId: Long) {
