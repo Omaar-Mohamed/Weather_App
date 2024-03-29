@@ -1,5 +1,6 @@
 package com.example.weatherapp.Home.view
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -25,6 +26,7 @@ import com.example.weatherapp.shared.ApiConstants
 import com.example.weatherapp.shared.SharedViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 
 class HomeFragment : Fragment() {
@@ -74,6 +76,11 @@ class HomeFragment : Fragment() {
             sharedViewModel.languageFlow.collectLatest {
 //                Log.i("response weather", "onCreateView:  $it" )
                 language = it
+                if (language == "ar") {
+                    setLocale("ar")
+                } else {
+                    setLocale("en")
+                }
             }
         }
 
@@ -139,5 +146,12 @@ class HomeFragment : Fragment() {
     fun fehToCelsius(feh: Double): String {
         var celsius = (feh - 32) * 5 / 9
         return celsius . toString() + "°C"
+    }
+    private fun setLocale(language: String) {
+        val locale = Locale(language)
+        Locale.setDefault(locale)
+        val config = Configuration()
+        config.setLocale(locale)
+        resources.updateConfiguration(config, resources.displayMetrics)
     }
 }

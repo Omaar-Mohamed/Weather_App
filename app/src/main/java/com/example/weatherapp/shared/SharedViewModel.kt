@@ -13,6 +13,7 @@ class SharedViewModel : ViewModel() {
     fun setLanguage(language: String) {
         viewModelScope.launch {
             _languageFlow.emit(language)
+
         }
     }
 

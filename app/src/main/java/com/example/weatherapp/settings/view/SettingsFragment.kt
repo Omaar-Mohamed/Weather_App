@@ -13,8 +13,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.FragmentSettingsBinding
+import com.example.weatherapp.shared.ApiConstants
 import com.example.weatherapp.shared.SharedViewModel
 import com.google.android.material.button.MaterialButtonToggleGroup
+import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -37,89 +39,106 @@ class SettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        selectedLanguage = getSelectedLanguage(requireContext()) // Get the selected language from shared preferences
+
+        // Get the selected language from shared preferences
+        val selectedLanguage = getSelectedLanguage(requireContext())
         sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
+
+        // Set the checked state of the language buttons based on the selected language
         when (selectedLanguage) {
             "en" -> binding.englishButton.isChecked = true
             "ar" -> binding.arabicButton.isChecked = true
         }
+
         // Language toggle group listener
         binding.languageToggleGroup.addOnButtonCheckedListener { group, checkedId, isChecked ->
             if (isChecked) {
                 when (checkedId) {
                     R.id.englishButton -> {
-                        Toast.makeText(
-                            requireContext(),
-                            "Selected language: English",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        // Save the selected language as English
                         saveSelectedLanguage(requireContext(), "en")
-//                        changeLanguage(getSelectedLanguage(requireContext()))
-                        sharedViewModel.setLanguage("en")
-                        lifecycleScope.launch {
-                            sharedViewModel.languageFlow.collect { language ->
-                                setLocale(language)
-                            }
-
-
-                        }
-//                        activity?.recreate()
+                        // Set the language and update the UI
+                        setLanguage("en")
+                        // Update drawer menu items with localized strings
+                        updateDrawerMenuItems("en")
                         this.findNavController().navigate(R.id.settingsFragment)
-
-
                     }
-
                     R.id.arabicButton -> {
-                        Toast.makeText(
-                            requireContext(),
-                            "Selected language: Arabic",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        // Save the selected language as Arabic
                         saveSelectedLanguage(requireContext(), "ar")
-//                        changeLanguage(getSelectedLanguage(requireContext()))
-                        sharedViewModel.setLanguage("ar")
-                        lifecycleScope.launch {
-                            sharedViewModel.languageFlow.collect { language ->
-                                setLocale(language)
-
-                            }
-                        }
-
+                        // Set the language and update the UI
+                        setLanguage(ApiConstants.getSelectedLanguage(requireContext()))
+                        // Update drawer menu items with localized strings
+                        updateDrawerMenuItems(ApiConstants.getSelectedLanguage(requireContext()))
                         this.findNavController().navigate(R.id.settingsFragment)
-
                     }
                 }
             }
-
         }
+    }
 
-
-        // Theme toggle group listener
-//        binding.themeToggleGroup.addOnButtonCheckedListener { group, checkedId, isChecked ->
-//            if (isChecked) {
-//                val selectedTheme = view.findViewById<MaterialButtonToggleGroup>(checkedId).text.toString()
-//                Toast.makeText(requireContext(), "Selected theme: $selectedTheme", Toast.LENGTH_SHORT).show()
-//            }
-//        }
-//
-//        // Temperature toggle group listener
-//        binding.tempToggleGroup.addOnButtonCheckedListener { group, checkedId, isChecked ->
-//            if (isChecked) {
-//                val selectedTemp = view.findViewById<MaterialButtonToggleGroup>(checkedId).text.toString()
-//                Toast.makeText(requireContext(), "Selected temperature: $selectedTemp", Toast.LENGTH_SHORT).show()
-//            }
-//        }
+    private fun setLanguage(languageCode: String) {
+        // Set the locale and update configuration to change the language
+        setLocale(languageCode)
+        // Notify observers (activities and fragments) about the language change
+        sharedViewModel.setLanguage(languageCode)
     }
 
     private fun setLocale(language: String) {
         val locale = Locale(language)
         Locale.setDefault(locale)
+
+        // Create a new configuration
         val config = Configuration()
         config.setLocale(locale)
+
+        // Set layout direction based on the language
+        if (language == "ar") {
+            config.setLayoutDirection(locale)
+        } else {
+            // Set LTR direction for other languages
+            config.setLayoutDirection(Locale("en"))
+        }
+
+        // Update the resources configuration
         resources.updateConfiguration(config, resources.displayMetrics)
     }
 
-    fun saveSelectedLanguage(context: Context, languageCode: String) {
+    private fun updateDrawerMenuItems(languageCode: String) {
+        val navView = requireActivity().findViewById<NavigationView>(R.id.nav_view)
+        val menu = navView.menu
+        // Loop through each item in the menu and update its title
+        for (i in 0 until menu.size()) {
+            val item = menu.getItem(i)
+            when (item.itemId) {
+                R.id.homeFragment -> {
+                    item.title = getLocalizedString(R.string.home, languageCode)
+                }
+                R.id.favouritFragment -> {
+                    item.title = getLocalizedString(R.string.favourit, languageCode)
+                }
+                R.id.alertFragment -> {
+                    item.title = getLocalizedString(R.string.alert, languageCode)
+                }
+                R.id.settingsFragment -> {
+                    item.title = getLocalizedString(R.string.settings, languageCode)
+                }
+                // Add cases for other menu items as needed
+            }
+        }
+    }
+
+    private fun getLocalizedString(resId: Int, languageCode: String): String {
+        val locale = Locale(languageCode)
+        val configuration = Configuration(resources.configuration)
+        configuration.setLocale(locale)
+        val localizedContext = requireContext().createConfigurationContext(configuration)
+        return localizedContext.resources.getString(resId)
+    }
+
+
+
+    private fun saveSelectedLanguage(context: Context, languageCode: String) {
         val sharedPref = context.getSharedPreferences("MySharedPref", Context.MODE_PRIVATE)
         with(sharedPref.edit()) {
             putString("selectedLanguage", languageCode)

@@ -29,18 +29,18 @@ class ApiConstants {
         }
 
 
-        fun convertUnixTimestampToDateTimeToDailyAdapter(unixTimestamp: Long): String {
+        fun convertUnixTimestampToDateTimeToDailyAdapter(unixTimestamp: Long , language:String): String {
             val date = Date(unixTimestamp * 1000L) // Convert seconds to milliseconds
             val calendar = Calendar.getInstance()
             calendar.time = date
             val dayOfWeek = when (calendar.get(Calendar.DAY_OF_WEEK)) {
-                Calendar.SUNDAY -> "Sunday"
-                Calendar.MONDAY -> "Monday"
-                Calendar.TUESDAY -> "Tuesday"
-                Calendar.WEDNESDAY -> "Wednesday"
-                Calendar.THURSDAY -> "Thursday"
-                Calendar.FRIDAY -> "Friday"
-                Calendar.SATURDAY -> "Saturday"
+                Calendar.SUNDAY -> if (language == "ar") "الأحد" else "Sunday"
+                Calendar.MONDAY -> if (language == "ar") "الإثنين" else "Monday"
+                Calendar.TUESDAY -> if (language == "ar") "الثلاثاء" else "Tuesday"
+                Calendar.WEDNESDAY -> if (language == "ar") "الأربعاء" else "Wednesday"
+                Calendar.THURSDAY -> if (language == "ar") "الخميس" else "Thursday"
+                Calendar.FRIDAY -> if (language == "ar") "الجمعة" else "Friday"
+                Calendar.SATURDAY -> if (language == "ar") "السبت" else "Saturday"
                 else -> ""
             }
             return dayOfWeek
@@ -85,6 +85,8 @@ class ApiConstants {
             val sharedPref = context.getSharedPreferences("MySharedPref", Context.MODE_PRIVATE)
             return sharedPref.getString("selectedLanguage", "en") ?: "en" // Default to 'en' if not set
         }
+
+
 
     }
 }

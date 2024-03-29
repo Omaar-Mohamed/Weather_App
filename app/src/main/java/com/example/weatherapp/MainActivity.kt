@@ -24,6 +24,7 @@ import com.example.weatherapp.R
 import com.example.weatherapp.databinding.ActivityMainBinding
 import com.example.weatherapp.shared.ApiConstants
 import com.example.weatherapp.shared.SharedViewModel
+import com.google.android.gms.common.api.Api
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -89,25 +90,34 @@ class MainActivity : AppCompatActivity() {
 
         drawerLayout = binding.drawerLayout
         sharedViewModel = ViewModelProvider(this@MainActivity).get(SharedViewModel::class.java)
-
+        sharedViewModel.setLanguage(ApiConstants.getSelectedLanguage(this@MainActivity))
         lifecycleScope.launch {
             sharedViewModel.languageFlow.collect { language ->
+                // Set locale and layout direction based on selected language
                 if (language == "en") {
-                    drawerLayout.layoutDirection = DrawerLayout.LAYOUT_DIRECTION_LTR
-//                    ViewCompat.LAYOUT_DIRECTION_LTR
                     setLocale("en")
-
-//                    recreate()
-
+                    drawerLayout.layoutDirection = DrawerLayout.LAYOUT_DIRECTION_LTR
+                    updateDrawerMenuItems("en")
                 } else {
-                    drawerLayout.layoutDirection = DrawerLayout.LAYOUT_DIRECTION_RTL
-//                    ViewCompat.LAYOUT_DIRECTION_RTL
                     setLocale("ar")
-//                    recreate()
+                    drawerLayout.layoutDirection = DrawerLayout.LAYOUT_DIRECTION_RTL
+                    updateDrawerMenuItems("ar")
                 }
 
+                // Update activity title based on selected language
+                val appName = getString(R.string.app_name)
+                title = if (language == "en") {
+                    appName
+                } else {
+                    // For Arabic or other languages, load the localized app name from resources
+                    val configuration = resources.configuration
+                    configuration.setLocale(Locale(language))
+                    val localizedAppName = createConfigurationContext(configuration).getString(R.string.app_name)
+                    localizedAppName
+                }
             }
         }
+
         navigationView = binding.navView
         binding.toolbar.setNavigationOnClickListener {
             drawerLayout.openDrawer(navigationView)
@@ -229,6 +239,39 @@ class MainActivity : AppCompatActivity() {
         configuration.setLocale(locale)
         val context = applicationContext.createConfigurationContext(configuration)
 
+    }
+
+    private fun updateDrawerMenuItems(languageCode: String) {
+        val navView = findViewById<NavigationView>(R.id.nav_view)
+        val menu = navView.menu
+        // Loop through each item in the menu and update its title
+        for (i in 0 until menu.size()) {
+            val item = menu.getItem(i)
+            when (item.itemId) {
+                R.id.homeFragment -> {
+                    item.title = getLocalizedString(R.string.home, languageCode)
+                }
+                R.id.favouritFragment -> {
+                    item.title = getLocalizedString(R.string.favourit, languageCode)
+                }
+                R.id.alertFragment -> {
+                    item.title = getLocalizedString(R.string.alert, languageCode)
+                }
+                R.id.settingsFragment -> {
+                    item.title = getLocalizedString(R.string.settings, languageCode)
+                }
+                // Add cases for other menu items as needed
+            }
+        }
+    }
+
+    // Utility function to get localized string based on language code
+    private fun getLocalizedString(stringResId: Int, languageCode: String): String {
+        val locale = Locale(languageCode)
+        val configuration = Configuration(resources.configuration)
+        configuration.setLocale(locale)
+        val localizedContext = createConfigurationContext(configuration)
+        return localizedContext.getString(stringResId)
     }
 
     }

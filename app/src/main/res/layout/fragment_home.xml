@@ -12,7 +12,7 @@
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
-        android:text="Current Weather"
+        android:text="@string/current_weather"
         android:layout_marginBottom="8dp"/>
 
     <androidx.cardview.widget.CardView
@@ -83,7 +83,7 @@
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
-        android:text="Hourly Weather"
+        android:text="@string/hourly_weather"
         android:layout_marginBottom="8dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -99,7 +99,7 @@
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
-        android:text="Hourly Weather"
+        android:text="@string/dayliy_weather"
         android:layout_marginBottom="8dp"/>
 
     <androidx.recyclerview.widget.RecyclerView

@@ -11,5 +11,8 @@
     <string name="light">ساطع</string>
     <string name="dark">داكن</string>
     <string name="temperature">درجة الحراره:</string>
+    <string name="current_weather">الموقع الحالي</string>
+    <string name="hourly_weather">الساعات القادمه</string>
+    <string name="dayliy_weather">الايام القادمه</string>
 
 </resources>

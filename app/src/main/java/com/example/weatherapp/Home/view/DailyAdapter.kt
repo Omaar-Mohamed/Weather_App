@@ -43,7 +43,7 @@ class DailyAdapter : ListAdapter<Daily , DailyAdapter.DailyViewHolder>(DailyDiff
             private val txtWeather: TextView = binding.textViewMinTemperature
 
             fun bind(daily: Daily) {
-                txtDate.text = ApiConstants.convertUnixTimestampToDateTimeToDailyAdapter(daily.dt)
+                txtDate.text = ApiConstants.convertUnixTimestampToDateTimeToDailyAdapter(daily.dt , ApiConstants.getSelectedLanguage(itemView.context))
                 Glide.with(itemView.context)
                     .load(ApiConstants.getWeatherIconUrl(daily.weather[0].icon))
                     .into(imgWeather)

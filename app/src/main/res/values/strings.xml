@@ -9,4 +9,7 @@
     <string name="light">Light</string>
     <string name="dark">Dark</string>
     <string name="temperature">Temperature:</string>
+    <string name="current_weather">Current Weather</string>
+    <string name="hourly_weather">Hourly Weather</string>
+    <string name="dayliy_weather">dayliy Weather</string>
 </resources>

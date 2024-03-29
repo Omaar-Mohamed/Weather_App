@@ -1,5 +1,6 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
@@ -12,23 +13,26 @@
         android:padding="16dp">
 
         <!-- Image and Text Layout -->
-        <FrameLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/innerLayout">
 
             <!-- Image -->
             <ImageView
                 android:id="@+id/imageViewIcon"
                 android:layout_width="70dp"
                 android:layout_height="70dp"
-                android:layout_gravity="top|end"
                 android:src="@drawable/weather"
-                android:padding="8dp" />
+                android:padding="8dp"
+                android:layout_gravity="start" />
 
             <!-- Text Layout -->
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:orientation="vertical"
                 android:padding="8dp">
 
@@ -52,8 +56,9 @@
                     android:gravity="start"
                     android:text="20 c / 40 c " />
 
-
             </LinearLayout>
-        </FrameLayout>
+        </LinearLayout>
+
+
     </LinearLayout>
 </androidx.cardview.widget.CardView>
