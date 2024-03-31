@@ -7,7 +7,9 @@ import com.example.weatherapp.model.dto.WeatherResponse
 import com.example.weatherapp.model.network.AppRemoteDataSourse
 import kotlinx.coroutines.flow.Flow
 
-class AppRepoImpl private constructor(private val appRemoteDataSourse: AppRemoteDataSourse , private val appLocalDataSourse: AppLocalDataSourse)
+class AppRepoImpl private constructor
+    (private val appRemoteDataSourse: AppRemoteDataSourse ,
+     private val appLocalDataSourse: AppLocalDataSourse)
     : AppRepo {
 
         companion object {
