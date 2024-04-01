@@ -1,114 +1,243 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <!-- Current Weather Section -->
-    <TextView
-        android:id="@+id/textViewCurrentWeather"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"
-        android:text="@string/current_weather"
-        android:layout_marginBottom="8dp"/>
+    <!-- Lottie Animation for Progress Indicator -->
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardViewCurrentWeather"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+
+    <!-- Main Content Layout -->
+    <LinearLayout
+        android:id="@+id/contentLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
         android:padding="16dp"
-        android:elevation="4dp"
-        android:gravity="center">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
+        <!-- Current Weather Section -->
+        <TextView
+            android:id="@+id/textViewCurrentWeather"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/current_weather"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <!-- CardView for Current Weather -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardViewCurrentWeather"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:elevation="4dp"
             android:gravity="center"
-            android:orientation="vertical">
+            android:padding="16dp"
+            app:layout_constraintTop_toBottomOf="@id/textViewCurrentWeather">
 
-            <!-- Image -->
-            <ImageView
-                android:id="@+id/imageViewWeatherIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:src="@drawable/weather" />
+
+        <!-- LinearLayout for Current Weather Content -->
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/textViewWeatherDescription"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Partly Cloudy"
-                    android:textColor="@color/black"
-                    android:textStyle="bold"
-                    android:textSize="30sp" />
-
+                <!-- Image -->
                 <ImageView
-                    android:id="@+id/imageViewWindIcon"
+                    android:id="@+id/imageViewWeatherIcon"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/weather" />
+
+                <!-- Weather Description -->
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:src="@drawable/location" />
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textViewWeatherDescription"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Partly Cloudy"
+                        android:textColor="@color/black"
+                        android:textSize="30sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:id="@+id/imageViewWindIcon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:src="@drawable/location" />
+                </LinearLayout>
+
+                <!-- Temperature -->
+                <TextView
+                    android:id="@+id/textViewTemperature"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="20°C"
+                    android:textColor="@color/black"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <!-- Linear Layout for Icons and Text -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal">
+
+                    <!-- First Icon -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/humidity" />
+
+                        <TextView
+                            android:id="@+id/humidity"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Icon 1"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <!-- Second Icon -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/windy" />
+
+                        <TextView
+                            android:id="@+id/windy"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Icon 2"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <!-- Third Icon -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/pressure" />
+
+                        <TextView
+                            android:id="@+id/pressure"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Icon 3"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <!-- Fourth Icon -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/clouds" />
+
+                        <TextView
+                            android:id="@+id/clouds"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Icon 4"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </LinearLayout>
             </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
-            <!-- Degree Text -->
-            <TextView
-                android:id="@+id/textViewTemperature"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="20°C"
-                android:textColor="@color/black"
-                android:textSize="24sp"
-                android:textStyle="bold" />
+        <!-- Hourly Weather Section -->
+        <TextView
+            android:id="@+id/textViewHourlyWeather"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/hourly_weather"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewHourlyWeather"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp" />
 
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+        <!-- Daily Weather Section -->
+        <TextView
+            android:id="@+id/textViewDailyWeather"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/dayliy_weather"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewDailyWeather"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp" />
 
-    <!-- Hourly Weather Section -->
-    <TextView
-        android:id="@+id/textViewHourlyWeather"
-        android:layout_width="match_parent"
+    </LinearLayout>
+
+    <!-- Circular Progress Indicator -->
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/circularProgressBar"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"
-        android:text="@string/hourly_weather"
-        android:layout_marginBottom="8dp"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewHourlyWeather"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="8dp"/>
-    <TextView
-        android:id="@+id/textViewDailyWeather"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"
-        android:text="@string/dayliy_weather"
-        android:layout_marginBottom="8dp"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewDailyWeather"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="8dp"/>
+        android:layout_gravity="center"
+        android:visibility="visible"
+        app:lottie_autoPlay="true"
+        app:lottie_fileName="weather_lottie.json"
+        app:lottie_loop="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

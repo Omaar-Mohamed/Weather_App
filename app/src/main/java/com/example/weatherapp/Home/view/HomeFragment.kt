@@ -1,5 +1,7 @@
 package com.example.weatherapp.Home.view
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
@@ -20,6 +22,7 @@ import com.example.weatherapp.model.AppRepo
 import com.example.weatherapp.model.AppRepoImpl
 import com.example.weatherapp.model.db.AppLocalDataSourse
 import com.example.weatherapp.model.db.AppLocalDataSourseImpL
+import com.example.weatherapp.model.dto.WeatherResponse
 import com.example.weatherapp.model.network.ApiState
 import com.example.weatherapp.model.network.AppRemoteDataSourseImpl
 import com.example.weatherapp.shared.ApiConstants
@@ -39,7 +42,9 @@ class HomeFragment : Fragment() {
     lateinit var dailyLayoutManager: LinearLayoutManager
     lateinit var dailyAdapter: DailyAdapter
     lateinit var sharedViewModel: SharedViewModel
-     var language : String = "ar"
+    private lateinit var sharedPreferences: SharedPreferences
+
+    var language : String = "ar"
     var temp : String = "metric"
 
     override fun onCreateView(
@@ -53,6 +58,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         hourlyAdapter = HourlyAdapter()
         dailyAdapter = DailyAdapter()
         myLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -62,11 +68,13 @@ class HomeFragment : Fragment() {
 
         binding.recyclerViewHourlyWeather.adapter = hourlyAdapter
         binding.recyclerViewDailyWeather.adapter = dailyAdapter
+        sharedPreferences = requireActivity().getSharedPreferences("Your_Pref_Name", Context.MODE_PRIVATE)
         homeViewModelFactory = HomeViewModelFactory(
             AppRepoImpl.getInstance(
                 AppRemoteDataSourseImpl, AppLocalDataSourseImpL.getInstance(requireContext())
-
-        ))
+        ),
+            sharedPreferences
+        )
         // Initialize ViewModel
         homeviewModel = ViewModelProvider(this, homeViewModelFactory).get(HomeViewModel::class.java)
 
@@ -110,27 +118,70 @@ class HomeFragment : Fragment() {
                     is ApiState.Loading -> {
                         // Handle loading state
                         // binding.progressBar.visibility = View.VISIBLE
+                        // Hide other views
+                        binding.textViewCurrentWeather.visibility = View.GONE
+                        binding.cardViewCurrentWeather.visibility = View.GONE
+                        binding.recyclerViewHourlyWeather.visibility = View.GONE
+                        binding.recyclerViewDailyWeather.visibility = View.GONE
+                        binding.textViewDailyWeather.visibility = View.GONE
+                        binding.textViewHourlyWeather.visibility = View.GONE
+
+// Show Lottie animation
+                        binding.circularProgressBar.visibility = View.VISIBLE
+
                     }
                     is ApiState.Failure -> {
                         // Handle failure state
-                        // binding.progressBar.visibility = View.GONE
+// Hide other views
+                        binding.textViewCurrentWeather.visibility = View.VISIBLE
+                        binding.cardViewCurrentWeather.visibility = View.VISIBLE
+                        binding.recyclerViewHourlyWeather.visibility = View.VISIBLE
+                        binding.recyclerViewDailyWeather.visibility = View.VISIBLE
+                        binding.textViewDailyWeather.visibility = View.VISIBLE
+                        binding.textViewHourlyWeather.visibility = View.VISIBLE
+
+// Show Lottie animation
+                        binding.circularProgressBar.visibility = View.GONE
+                        val weatherResponse = homeviewModel.getWeatherResponse()
+
+                        if (weatherResponse != null) {
+                            updateUI(weatherResponse)
+                        }
+
+
                         Log.i("response weather", "onCreateView:  error" + it.error)
                     }
                     is ApiState.Success -> {
                         // Handle success state
                         // binding.progressBar.visibility = View.GONE
-                        Log.i("response weather", "onCreateView:  ${it.data}" )
-                        Log.i("response weather", "onCreateView:  ${it.data.hourly}" )
-                        Glide.with(requireContext()).load("https://openweathermap.org/img/wn/${it.data.current.weather[0].icon}.png").into(
-                        binding.imageViewWeatherIcon)
-                       binding.textViewWeatherDescription.text = splitTimeZone(it.data.timezone)
-                        binding.textViewTemperature.text = when(temp){
-                            "metric" -> it.data.current.temp.toString() + "°C"
-                            "imperial" -> it.data.current.temp.toString() + "°F"
-                            else -> it.data.current.temp.toString() + "°K"
-                        }
-                        hourlyAdapter.submitList(it.data.hourly)
-                        dailyAdapter.submitList(it.data.daily)
+                        binding.textViewCurrentWeather.visibility = View.VISIBLE
+                        binding.cardViewCurrentWeather.visibility = View.VISIBLE
+                        binding.recyclerViewHourlyWeather.visibility = View.VISIBLE
+                        binding.recyclerViewDailyWeather.visibility = View.VISIBLE
+                        binding.textViewDailyWeather.visibility = View.VISIBLE
+                        binding.textViewHourlyWeather.visibility = View.VISIBLE
+
+// Show Lottie animation
+                        binding.circularProgressBar.visibility = View.GONE
+//                        Log.i("response weather", "onCreateView:  ${it.data}" )
+//                        Log.i("response weather", "onCreateView:  ${it.data.hourly}" )
+//                        Glide.with(requireContext()).load("https://openweathermap.org/img/wn/${it.data.current.weather[0].icon}.png").into(
+//                        binding.imageViewWeatherIcon)
+//                       binding.textViewWeatherDescription.text = splitTimeZone(it.data.timezone)
+//                        binding.textViewTemperature.text = when(temp){
+//                            "metric" -> it.data.current.temp.toString() + "°C"
+//                            "imperial" -> it.data.current.temp.toString() + "°F"
+//                            else -> it.data.current.temp.toString() + "°K"
+//                        }
+//                        binding.humidity.text = "${it.data.current.humidity?.toString() ?: ""}%"
+//                        binding.clouds.text = "${it.data.current.clouds?.toString() ?: ""}%"
+//                        binding.pressure.text = "${it.data.current.pressure?.toString() ?: ""}mb"
+//                        binding.windy.text = "${it.data.current.windSpeed?.toString() ?: ""}%"
+//
+//                        hourlyAdapter.submitList(it.data.hourly)
+//                        dailyAdapter.submitList(it.data.daily)
+                        homeviewModel.saveWeatherResponse(it.data)
+                        updateUI(it.data)
 
                     }
                 }
@@ -165,5 +216,25 @@ class HomeFragment : Fragment() {
         val config = Configuration()
         config.setLocale(locale)
         resources.updateConfiguration(config, resources.displayMetrics)
+    }
+    private fun updateUI(weatherResponse: WeatherResponse) {
+        // Update UI with the weather response data
+        Log.i("response weather", "onCreateView:  ${weatherResponse}" )
+        Log.i("response weather", "onCreateView:  ${weatherResponse.hourly}" )
+        Glide.with(requireContext()).load("https://openweathermap.org/img/wn/${weatherResponse.current.weather[0].icon}.png").into(
+            binding.imageViewWeatherIcon)
+        binding.textViewWeatherDescription.text = splitTimeZone(weatherResponse.timezone)
+        binding.textViewTemperature.text = when(temp){
+            "metric" -> weatherResponse.current.temp.toString() + "°C"
+            "imperial" -> weatherResponse.current.temp.toString() + "°F"
+            else -> weatherResponse.current.temp.toString() + "°K"
+        }
+        binding.humidity.text = "${weatherResponse.current.humidity?.toString() ?: ""}%"
+        binding.clouds.text = "${weatherResponse.current.clouds?.toString() ?: ""}%"
+        binding.pressure.text = "${weatherResponse.current.pressure?.toString() ?: ""}mb"
+        binding.windy.text = "${weatherResponse.current.windSpeed?.toString() ?: ""}%"
+
+        hourlyAdapter.submitList(weatherResponse.hourly)
+        dailyAdapter.submitList(weatherResponse.daily)
     }
 }
