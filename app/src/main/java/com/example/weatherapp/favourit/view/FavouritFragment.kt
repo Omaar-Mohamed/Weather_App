@@ -50,10 +50,11 @@ class FavouritFragment : Fragment() {
                 favViewModel.deleteLocation(it)
                 Toast.makeText(requireContext() , "Location Deleted" , Toast.LENGTH_SHORT).show()
             },
-            sendToDetails = { lat , lon ->
+            sendToDetails = { lat , lon  , id->
                 var intent = Intent(requireContext() , FavDetailsActivity::class.java)
                 intent.putExtra("lat" , lat)
                 intent.putExtra("lon" , lon)
+                intent.putExtra("id" , id)
                 startActivity(intent)
             }
         )

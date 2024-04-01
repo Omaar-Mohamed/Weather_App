@@ -13,7 +13,7 @@ import com.example.weatherapp.model.dto.FavLocations
 
 class FavAdapter(
     private val action: (FavLocations) -> Unit,
-    private val sendToDetails: (Float, Float) -> Unit
+    private val sendToDetails: (Float, Float , Int) -> Unit
 ) : ListAdapter<FavLocations, FavAdapter.FavViewHolder>(FavDiffUtil()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavViewHolder {
@@ -45,7 +45,7 @@ class FavAdapter(
         fun bind(
             fav: FavLocations,
             action: (FavLocations) -> Unit,
-            sendToDetails: (Float, Float) -> Unit
+            sendToDetails: (Float, Float , Int) -> Unit
         ) {
             txtAddress.text = fav.address
             removeBtn.setOnClickListener {
@@ -53,7 +53,7 @@ class FavAdapter(
             }
             itemView.setOnClickListener {
                 // Invoke sendToDetails with latitude and longitude
-                sendToDetails(15.0f, 13.0f)
+                sendToDetails(fav.latitude.toFloat(), fav.longitude.toFloat() , fav.id)
             }
         }
     }

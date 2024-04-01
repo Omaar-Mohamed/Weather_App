@@ -40,4 +40,17 @@ class HomeViewModel(private val appRepo: AppRepo , private val sharedPreferences
         val json = sharedPreferences.getString("weather_response", null)
         return gson.fromJson(json, WeatherResponse::class.java)
     }
+
+    fun saveWeatherResponseInFav(id: String, weatherResponse: WeatherResponse) {
+        val gson = Gson()
+        val json = gson.toJson(weatherResponse)
+        sharedPreferences.edit().putString("weather_response_$id", json).apply()
+    }
+
+    fun getWeatherResponseInFav(id: String): WeatherResponse? {
+        val gson = Gson()
+        val json = sharedPreferences.getString("weather_response_$id", null)
+        return gson.fromJson(json, WeatherResponse::class.java)
+    }
+
 }
