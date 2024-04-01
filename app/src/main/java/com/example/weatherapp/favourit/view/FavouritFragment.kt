@@ -49,6 +49,12 @@ class FavouritFragment : Fragment() {
             action = {
                 favViewModel.deleteLocation(it)
                 Toast.makeText(requireContext() , "Location Deleted" , Toast.LENGTH_SHORT).show()
+            },
+            sendToDetails = { lat , lon ->
+                var intent = Intent(requireContext() , FavDetailsActivity::class.java)
+                intent.putExtra("lat" , lat)
+                intent.putExtra("lon" , lon)
+                startActivity(intent)
             }
         )
         favLayoutManager = LinearLayoutManager(requireContext() , LinearLayoutManager.VERTICAL , false)

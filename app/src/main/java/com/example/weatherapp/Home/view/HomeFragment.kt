@@ -184,6 +184,8 @@ class HomeFragment : Fragment() {
                         updateUI(it.data)
 
                     }
+
+                    else -> {}
                 }
             }
         }

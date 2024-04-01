@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
@@ -85,7 +86,10 @@ class AlertFragment : Fragment() {
         alartAdapter = AlartAdapter(
             action = {
                 alartViewModel.deleteAlert(it)
+                WorkManager.getInstance(requireContext()).cancelUniqueWork("alert_worker_$lastindex")
+
                 Toast.makeText(requireContext(), "Alert Deleted", Toast.LENGTH_SHORT).show()
+
             }
         )
         alartLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
@@ -222,87 +226,24 @@ class AlertFragment : Fragment() {
                         .setInputData(inputData)
                         .setInitialDelay(delay, TimeUnit.MINUTES)
                         .build()
-                    WorkManager.getInstance(requireContext()).enqueue(alertWorker)
+                    val uniqueTag = "alert_worker_$lastindex"  // Use a unique tag, perhaps incorporating the last index
+                    WorkManager.getInstance(requireContext()).enqueueUniqueWork(uniqueTag, ExistingWorkPolicy.REPLACE, alertWorker)
+
+//                    WorkManager.getInstance(requireContext()).enqueue(alertWorker)
 //                    setAlarm(ApiConstants.alartlon.toDouble(), ApiConstants.alertlat.toDouble(), desiredDateTime!!.timeInMillis, lastindex)
                 }
 
-//                lifecycleScope.launch {
-//                    alartViewModel.alert.collect {
-//                        when (it) {
-//                            is AlertDbState.Success -> {
-//                                alartAdapter.submitList(it.data)
-//                                if (it.data.isNotEmpty()) {
-//                                    lastindex = it.data.last().id + 1
-//                                    Log.i("alertsResult", "onCreateView: " + it.data.last().id)
-//
-//                                } else {
-////                        lastindex = it.data.last().id +1
-//                                }
-//                            }
-//
-//                            else -> {}
-//                        }
-//                    }
-//                }
 
                 Log.i("lastIndex", "showCustomPopupDialog: "+lastindex)
-//                val inputData = Data.Builder()
-//                    .putString("title", "Weather Alert")
-//                    .putString("message", "It's going to rain today!")
-//                    .putString("alertLat", ApiConstants.alertlat)
-//                    .putString("alertLon", ApiConstants.alartlon)
-//
-//                    .putLong("lastIndex" , lastindex)
-//
-//                    .build()
+
                 Log.i(
                     "alertlonandlan",
                     "showCustomPopupDialog: " + ApiConstants.alertlat + " " + ApiConstants.alartlon
                 )
 
-//                val alertWorker = OneTimeWorkRequestBuilder<AlertWorker>()
-//                    .setInputData(inputData)
-//                    .setInitialDelay(delay, TimeUnit.MINUTES)
-//                    .build()
-//                WorkManager.getInstance(requireContext()).enqueue(alertWorker)
-
-
-
                 Log.i("alartobjectid", "showCustomPopupDialog: " + alartDto.id)
 
 
-
-
-
-
-//                 lifecycleScope.launch {
-//                    alartViewModel.lastAlertInserted.collectLatest {
-//                        when(it){
-//                            is AlertDbState.Success -> {
-//                                Log.i("lastInserted", "onCreateView: "+it.data)
-//                                Toast.makeText(context, "Alert Inserted ${it.data[0]}" , Toast.LENGTH_SHORT).show()
-//                                lastInsertedDto = it.data[0]
-//                                Log.i("lastInsertedAlert", "showCustomPopupDialog: "+lastInsertedDto.id)
-//
-//                            }
-//                            is AlertDbState.Loading -> {}
-//                            is AlertDbState.Failure -> {}
-//
-//                            else -> {
-//
-//                            }
-//                        }
-//                    }
-//                }
-
-//                WorkManager.getInstance(context).getWorkInfoByIdLiveData(alertWorker.id)
-//                    .observe(viewLifecycleOwner) { workInfo ->
-//                        if (workInfo != null && workInfo.state.isFinished) {
-//                            alartViewModel.deleteAlert(
-//                                lastInsertedDto
-//                            )
-//                        }
-//                    }
                 dialog.dismiss()
                 Toast.makeText(
                     context,

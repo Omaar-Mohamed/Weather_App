@@ -11,9 +11,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.databinding.FavItemBinding
 import com.example.weatherapp.model.dto.FavLocations
 
-class FavAdapter(private val action: (FavLocations) -> Unit ,
-
-    ) : ListAdapter<FavLocations , FavAdapter.FavViewHolder>(FavDiffUtil()) {
+class FavAdapter(
+    private val action: (FavLocations) -> Unit,
+    private val sendToDetails: (Float, Float) -> Unit
+) : ListAdapter<FavLocations, FavAdapter.FavViewHolder>(FavDiffUtil()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -23,7 +24,7 @@ class FavAdapter(private val action: (FavLocations) -> Unit ,
 
     override fun onBindViewHolder(holder: FavViewHolder, position: Int) {
         val fav = getItem(position)
-        holder.bind(fav , action)
+        holder.bind(fav, action, sendToDetails)
     }
 
     class FavDiffUtil : DiffUtil.ItemCallback<FavLocations>() {
@@ -36,16 +37,24 @@ class FavAdapter(private val action: (FavLocations) -> Unit ,
         }
     }
 
-    class FavViewHolder(private val binding: FavItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    class FavViewHolder(private val binding: FavItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         private val txtAddress: TextView = binding.textViewMinTemperature
-        private val reomveBtn : ImageButton = binding.imageViewNewIcon
+        private val removeBtn: ImageButton = binding.imageViewNewIcon
 
-        fun bind(fav: FavLocations ,  action: (FavLocations) -> Unit  ) {
+        fun bind(
+            fav: FavLocations,
+            action: (FavLocations) -> Unit,
+            sendToDetails: (Float, Float) -> Unit
+        ) {
             txtAddress.text = fav.address
-            reomveBtn.setOnClickListener {
+            removeBtn.setOnClickListener {
                 action(fav)
             }
-
+            itemView.setOnClickListener {
+                // Invoke sendToDetails with latitude and longitude
+                sendToDetails(15.0f, 13.0f)
+            }
         }
     }
 }
