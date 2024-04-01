@@ -119,7 +119,6 @@ class AlertViewModelTest {
 
     @Test
     fun testGetLastInsertedRow() {
-        // Write your test for getLastInsertedRow() function here
         runBlockingTest {
             val newAlert = AlertDto(5, "loc5", "temp5", "desc5")
             val insertedId = viewModel.insertAlert(newAlert)
@@ -135,7 +134,6 @@ class AlertViewModelTest {
 
     @Test
     fun testDeleteAlertById() {
-        // Write your test for deleteAlertById() function here
         runBlockingTest {
             val newAlert = AlertDto(5, "loc5", "temp5", "desc5")
             val insertedId = viewModel.insertAlert(newAlert)
