@@ -13,7 +13,7 @@
         android:layout_height="?attr/actionBarSize"
         android:elevation="4dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:title="Your App Name"
+        app:title="@string/app_name"
         app:navigationIcon="?android:attr/homeAsUpIndicator"
         app:contentInsetStart="0dp"
         app:contentInsetLeft="0dp"

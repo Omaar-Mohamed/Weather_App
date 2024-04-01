@@ -28,6 +28,7 @@ import com.example.weatherapp.model.dto.WeatherResponse
 import com.example.weatherapp.model.network.ApiState
 import com.example.weatherapp.model.network.AppRemoteDataSourseImpl
 import com.example.weatherapp.shared.ApiConstants
+import com.example.weatherapp.shared.SharedViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -38,14 +39,36 @@ class FavDetailsActivity : AppCompatActivity() {
     lateinit var homeviewModel: HomeViewModel
     lateinit var homeViewModelFactory: HomeViewModelFactory
     private lateinit var sharedPreferences: SharedPreferences
-    private val temp = "metric"
+    private var temp = "metric"
     lateinit var hourlyAdapter: HourlyAdapter
     lateinit var dailyAdapter: DailyAdapter
     lateinit var dailyLayoutManager : LinearLayoutManager
     lateinit var hourlyLayoutManager : LinearLayoutManager
+    lateinit var sharedViewModel: SharedViewModel
+    var language = "en"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
+        lifecycleScope.launch {
+            sharedViewModel.languageFlow.collectLatest {
+//                Log.i("response weather", "onCreateView:  $it" )
+                language = it
+                if (language == "ar") {
+                    setLocale("ar")
+                } else {
+                    setLocale("en")
+                }
+            }
+        }
+        temp = ApiConstants.getSelectedDegree(this)
+        lifecycleScope.launch {
+            sharedViewModel.degreeFlow.collectLatest {
+                temp = it
+            }
+        }
+
+
         binding = ActivityFavDetailsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         sharedPreferences = getSharedPreferences("weather_app", MODE_PRIVATE)
@@ -53,7 +76,7 @@ class FavDetailsActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.title = "Favourite Details"
+//        supportActionBar?.title = "Favourite Details"
 
         // Handle back button click
         toolbar.setNavigationOnClickListener {
@@ -84,8 +107,8 @@ class FavDetailsActivity : AppCompatActivity() {
             lat.toString(),
             lon.toString(),
             ApiConstants.API_KEY,
-            language = "en",
-            units = "metric"
+            language,
+            temp
         )
 
 

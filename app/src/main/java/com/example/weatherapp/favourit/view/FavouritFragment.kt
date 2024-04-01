@@ -1,6 +1,7 @@
 package com.example.weatherapp.favourit.view
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -19,8 +20,10 @@ import com.example.weatherapp.model.AppRepoImpl
 import com.example.weatherapp.model.db.AppLocalDataSourseImpL
 import com.example.weatherapp.model.db.DbState
 import com.example.weatherapp.model.network.AppRemoteDataSourseImpl
+import com.example.weatherapp.shared.SharedViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 
 class FavouritFragment : Fragment() {
@@ -29,6 +32,7 @@ class FavouritFragment : Fragment() {
     lateinit var favLayoutManager: LinearLayoutManager
     lateinit var favViewModelFactory: FavouritViewModelFactory
     lateinit var favViewModel: FavouritViewModel
+    lateinit var sharedViewModel:SharedViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,6 +45,14 @@ class FavouritFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentFavouritBinding.bind(view)
+        sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
+
+        lifecycleScope.launch {
+            sharedViewModel.languageFlow.collectLatest {
+//                Log.i("response weather", "onCreateView:  $it" )
+               setLocale(it)
+            }
+        }
         binding.fab.setOnClickListener {
             var intent = Intent(requireContext() , MapActivity::class.java)
             startActivity(intent)
@@ -87,5 +99,12 @@ class FavouritFragment : Fragment() {
 
     }
 
+    private fun setLocale(language: String) {
+        val locale = Locale(language)
+        Locale.setDefault(locale)
+        val config = Configuration()
+        config.setLocale(locale)
+        resources.updateConfiguration(config, resources.displayMetrics)
+    }
 
 }
