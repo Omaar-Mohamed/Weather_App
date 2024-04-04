@@ -81,6 +81,7 @@ dependencies {
     //lottie
     implementation 'com.airbnb.android:lottie:4.2.0'
 
+    implementation 'androidx.media:media:1.7.0'
 
 
 // testing
