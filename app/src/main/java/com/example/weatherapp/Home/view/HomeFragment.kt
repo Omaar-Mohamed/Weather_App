@@ -27,8 +27,10 @@ import com.example.weatherapp.model.network.ApiState
 import com.example.weatherapp.model.network.AppRemoteDataSourseImpl
 import com.example.weatherapp.shared.ApiConstants
 import com.example.weatherapp.shared.SharedViewModel
+import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.text.NumberFormat
 import java.util.Locale
 
 
@@ -59,6 +61,10 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val navigationView = requireActivity().findViewById<NavigationView>(R.id.nav_view)
+
+        // Check if navigationView is not null before calling methods on it
+        navigationView?.setCheckedItem(R.id.homeFragment)
         hourlyAdapter = HourlyAdapter()
         dailyAdapter = DailyAdapter()
         myLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -75,6 +81,7 @@ class HomeFragment : Fragment() {
         ),
             sharedPreferences
         )
+
         // Initialize ViewModel
         homeviewModel = ViewModelProvider(this, homeViewModelFactory).get(HomeViewModel::class.java)
 
@@ -226,10 +233,20 @@ class HomeFragment : Fragment() {
         Glide.with(requireContext()).load("https://openweathermap.org/img/wn/${weatherResponse.current.weather[0].icon}.png").into(
             binding.imageViewWeatherIcon)
         binding.textViewWeatherDescription.text = splitTimeZone(weatherResponse.timezone)
+
+        // Get the current locale
+        val locale = Locale.getDefault()
+
+        // Get a NumberFormat instance for the current locale
+        val numberFormat = NumberFormat.getInstance(locale)
+
+        // Format the temperature
+        val formattedTemp = numberFormat.format(weatherResponse.current.temp)
+
         binding.textViewTemperature.text = when(temp){
-            "metric" -> weatherResponse.current.temp.toString() + "°C"
-            "imperial" -> weatherResponse.current.temp.toString() + "°F"
-            else -> weatherResponse.current.temp.toString() + "°K"
+            "metric" -> formattedTemp + "°C"
+            "imperial" -> formattedTemp + "°F"
+            else -> formattedTemp + "°K"
         }
         binding.humidity.text = "${weatherResponse.current.humidity?.toString() ?: ""}%"
         binding.clouds.text = "${weatherResponse.current.clouds?.toString() ?: ""}%"

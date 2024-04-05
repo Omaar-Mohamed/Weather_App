@@ -41,6 +41,7 @@ class DailyAdapter : ListAdapter<Daily , DailyAdapter.DailyViewHolder>(DailyDiff
             private val txtDate: TextView = binding.textViewDay
             private val imgWeather: ImageView = binding.imageViewIcon
             private val txtWeather: TextView = binding.textViewMinTemperature
+            private val txtDegree: TextView = binding.textViewMaxTemperature
 
             fun bind(daily: Daily) {
                 txtDate.text = ApiConstants.convertUnixTimestampToDateTimeToDailyAdapter(daily.dt , ApiConstants.getSelectedLanguage(itemView.context))
@@ -48,6 +49,15 @@ class DailyAdapter : ListAdapter<Daily , DailyAdapter.DailyViewHolder>(DailyDiff
                     .load(ApiConstants.getWeatherIconUrl(daily.weather[0].icon))
                     .into(imgWeather)
                 txtWeather.text = daily.weather[0].description
+                txtDegree.text = when (val selectedDegree = ApiConstants.getSelectedDegree(itemView.context)) {
+                    "metric" -> String.format("%.0f°C", daily.temp.max ,"/" ,daily.temp.min)
+                    "imperial" -> String.format("%.0f°F", daily.temp.max ,"/" ,daily.temp.min)
+                    "standard" -> String.format("%.0f°", daily.temp.max ,"/" ,daily.temp.min)
+                    else -> {
+                        // Handle unknown degree types gracefully
+                        "Unknown degree type: $selectedDegree"
+                    }
+                }
 
             }
         }
